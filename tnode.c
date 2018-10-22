@@ -7,11 +7,6 @@
 #include <assert.h>
 #include "tnode.h"
 
-// stores a freeMethod function pointer in TNODE struct
-typedef void (*FM)(void * ptr);
-// stores a displayMethod function pointer in TNODE struct
-typedef void (*DM)(void * ptr, FILE *fp);
-
 extern TNODE * newTNODE(void * val, TNODE * l, TNODE * r, TNODE * p) {
   TNODE * node = malloc(sizeof(TNODE));
   assert(node != NULL);
@@ -77,7 +72,7 @@ extern void displayTNODE(TNODE * n, FILE * fp) {
   // case 4: displayMethod != 0 && debugVal > 0
   if (n->diplayMethod == 0) {
     if (n->debugVal == 0) {
-      /* code */
+      // FIXME
     }
     else {
       // print "&valueAddress&nodeAddress"
@@ -86,7 +81,7 @@ extern void displayTNODE(TNODE * n, FILE * fp) {
   }
   else if (n->displayMethod != 0) {
     if (n->debugVal == 0) {
-      /* code */
+      // FIXME
     }
     else {
       // pass value to node's displayMethod
