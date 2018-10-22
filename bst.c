@@ -1,10 +1,11 @@
 /*File: bst.c
- *Author: Emily Turner
+ *Author: Chance Tudor
  *Implements functions found in bst.h in order to implement a binary search tree
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "queue.h"
 #include "bst.h"
 
@@ -17,6 +18,90 @@ static int findMaxDepth(bstNode *);
 static void displayNode(FILE *, bstNode *, bst *);
 static bstNode *newBSTNode(void *);
 static void deleteNode(bstNode *n);
+
+extern BST * newBST(int (*c)(void * one, void * two)) {
+  BST * tree = malloc(sizeof(BST));
+  assert(tree != NULL);
+  tree->root = NULL;
+  tree->size = 0;
+  tree->comparator = c;
+  tree->displayMethod = 0;
+  tree->swapper = 0;
+  tree->freeMethod = 0;
+
+  return tree;
+}
+// sets displayMethod
+extern void setBSTdisplay(BST * t, void (*d)(void * ptr, FILE * fp)) {
+  t->displayMethod = d;
+}
+// sets swapMethod
+extern void setBSTswapper(BST *t, void (*s)(TNODE * one, TNODE * two)) {
+  t->swapper = s;
+}
+// sets freeMethod
+extern void setBSTfree(BST *t, void (*f)(void * ptr)) {
+  t->freeMethod = f;
+}
+// returns root of a tree
+extern TNODE * getBSTroot(BST *t) {
+  return t->root;
+}
+// sets root of a tree
+extern void setBSTroot(BST *t, TNODE *replacement) {
+  t->root = replacement;
+}
+// sets size of a tree
+extern void setBSTsize(BST *t, int s) {
+  t->size = s;
+}
+// inserts a new node into the BST and returns inserted node
+extern TNODE *insertBST(BST *t, void * value) {
+  setBSTsize(t, ++sizeBST(t));
+  TNODE * newNode = newTNODE(value, NULL, NULL, NULL);
+  TNODE * temp = getBSTroot(t);
+
+  //If the tree is empty set the root, return
+  if (temp == NULL) {
+    setBSTroot(t, newNode);
+    return newNode;
+  }
+  while (temp) {
+    newNode->parent = temp;
+    if (t->comparator(getTNODEvalue(temp), value) == 1) {
+      temp = temp->left;
+    }
+    else {
+      temp = temp->right;
+    }
+  }
+  if (tree->compare(getTNODEvalue(getTNODEparent(newNode)), value) == 1) {
+    setTNODEleft(getTNODEparent(newNode), newNode)
+  }
+  else {
+    setTNODEright(getTNODEparent(newNode), newNode)
+  }
+
+  return newNode;
+}
+// returns the value with the searched-for key
+// if key is not in the tree, the method returns null
+extern void * findBST(BST *t, void *key) {
+  TNODE * temp = findBSTNode(tree, value);
+  if () return getTNODEvalue(temp);
+  return NULL;
+}
+
+extern bstNode *findBSTNode(bst *tree, void *value) {
+  bstNode *temp = tree->root;
+  while (temp && tree->compare(temp->value, value) != 0) {
+    if (tree->compare(temp->value, value) > 0) temp = temp->left;
+    else temp = temp->right;
+  }
+  return temp;
+}
+
+
 
 static bstNode *newBSTNode(void *value)
 {
@@ -33,76 +118,8 @@ static bstNode *newBSTNode(void *value)
     return n;
 }
 
-extern bst *newBST(void (*d)(FILE *,void *),int (*c)(void *,void *))
-{
-    bst *tree = (bst *)malloc(sizeof(bst));
-    if (tree == 0)
-    {
-        fprintf(stderr,"Error: out of memory\n");
-        exit(-1);
-    }
-    tree->root = NULL;
-    tree->size = 0;
-    tree->display = d;
-    tree->compare = c;
-    return tree;
-}
-
-extern int sizeBST(bst *tree)
-{
-    return tree->size;
-}
-
-extern bstNode *insertBST(bst *tree,void *value)
-{
-    tree->size++;
-    bstNode *n = newBSTNode(value);
-    bstNode *temp = tree->root;
-
-    //If the tree is empty set the root, return
-    if (temp == NULL)
-    {
-        tree->root = n;
-        return n;
-    }
-    while (temp)
-    {
-        n->parent = temp;
-        if (tree->compare(temp->value, value) == 1)
-        {
-            temp = temp->left;
-        }
-        else
-        {
-            temp = temp->right;
-        }
-    }
-    if (tree->compare(n->parent->value, value) == 1)
-    {
-        n->parent->left = n;
-    }
-    else
-    {
-        n->parent->right = n;
-    }
-    return n;
-}
-
-extern int findBST(bst *tree,void *value)
-{
-    if (findBSTNode(tree, value)) return 1;
-    return 0;
-}
-
-extern bstNode *findBSTNode(bst *tree,void *value)
-{
-    bstNode *temp = tree->root;
-    while (temp && tree->compare(temp->value, value) != 0)
-    {
-        if (tree->compare(temp->value, value) > 0) temp = temp->left;
-        else temp = temp->right;
-    }
-    return temp;
+extern int sizeBST(BST * t) {
+  return t->size;
 }
 
 static void deleteNode(bstNode *n)
@@ -125,13 +142,12 @@ extern void pruneBSTNode(bst *tree, bstNode *n)
     deleteNode(n);
 }
 
-bstNode *swapValues(bstNode *x, bstNode *y)
-{
-    void *temp = x->value;
-    x->value = y->value;
-    y->value = temp;
+bstNode *swapValues(bstNode *x, bstNode *y) {
+  void *temp = x->value;
+  x->value = y->value;
+  y->value = temp;
 
-    return y;
+  return y;
 }
 
 bstNode *findPredecessor(bstNode *n)
@@ -147,24 +163,26 @@ bstNode *findSuccessor(bstNode *n)
     while (temp->left) temp = temp->left;
     return temp;
 }
-
-extern bstNode *swapToLeafBSTNode(bstNode *n)
-{
-    if (n == NULL) return n; //error
-    if (isLeaf(n)) return n;
-    bstNode *temp;
-    if (n->left)
-    {
-        temp = swapValues(n, findPredecessor(n));
-    }
-    else
-    {
-        temp = swapValues(n, findSuccessor(n));
-    }
-    return swapToLeafBSTNode(temp);
+/* takes a node and recursively swaps its value with its predecessor's (preferred)
+* or its successor's until a leaf node holds the original value.
+* calls the BST’s swapper function to actually accomplish the swap,
+* sending the two nodes whose values need to be swapped.
+* The method returns the leaf node holding the swapped value.
+*/
+extern TNODE *swapToLeafBST(BST *t, TNODE *node) {
+  if (node == NULL) return node; //error
+  if (isLeaf(node)) return node;
+  TNODE *temp;
+  if (getTNODEleft(temp)) {
+    temp = swapValues(node, findPredecessor(node));
+  }
+  else {
+    temp = swapValues(node, findSuccessor(node));
+  }
+  return swapToLeafBSTNode(temp);
 }
 
-int findMinDepth(bstNode *n)
+static int findMinDepth(bstNode *n)
 {
     if (n == NULL) return 0;
 
@@ -175,7 +193,7 @@ int findMinDepth(bstNode *n)
     else return ldepth + 1;
 }
 
-int findMaxDepth(bstNode *n)
+static int findMaxDepth(bstNode *n)
 {
     if (n == NULL) return 0;
 
@@ -248,20 +266,17 @@ static int isRightChild(bstNode *n)
     return 0;
 }
 
-static int isLeftChild(bstNode *n)
-{
-    if (n->parent->left == n) return 1;
-    return 0;
+static int isLeftChild(bstNode *n) {
+  if (n->parent->left == n) return 1;
+  return 0;
 }
 
-static int isLeaf(bstNode *n)
-{
-    if (!n->left && !n->right) return 1;
-    return 0;
+static int isLeaf(bstNode *n) {
+  if (!n->left && !n->right) return 1;
+  return 0;
 }
 
-static int isRoot(bstNode *n)
-{
-    if (n->parent == n) return 1;
-    return 0;
+static int isRoot(bstNode *n) {
+  if (n->parent == n) return 1;
+  return 0;
 }
