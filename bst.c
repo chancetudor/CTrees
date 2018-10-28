@@ -152,7 +152,7 @@ extern void statisticsBST(BST *t, FILE *fp) {
 * '=' should precede the node value. example:
 * 0: 20(20)X
 * 1: =7(20)L =33(20)R
-* empty tree prints 0: followed by newline
+* empty tree prints '0:'' followed by newline
 */
 extern void displayBST(BST *t, FILE *fp) {
   int level = 0;
