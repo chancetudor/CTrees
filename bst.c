@@ -142,8 +142,8 @@ extern int sizeBST(BST * t) {
 */
 extern void statisticsBST(BST *t, FILE *fp) {
   fprintf(fp, "Nodes: %d\n", sizeBST(t));
-  fprintf(fp, "Minimum depth: %d\n", findMinDepth(t->root));
-  fprintf(fp, "Maximum depth: %d\n", findMaxDepth(t->root));
+  fprintf(fp, "Minimum depth: %d\n", findMinDepth(getBSTroot(t)));
+  fprintf(fp, "Maximum depth: %d\n", findMaxDepth(getBSTroot(t)));
 }
 /* prints a level-order traversal of the tree; each level on its own line
 * each line starts with the level number
