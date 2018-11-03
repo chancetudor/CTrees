@@ -89,26 +89,28 @@ extern TNODE *insertBST(BST *t, void * value) {
 }
 // returns the value with the searched-for key
 // if key is not in the tree, the method returns null
-extern void * findBST(BST *t, void *key) { // FIXME: write function
-  TNODE * temp = findBSTNode(tree, value);
-  if () return getTNODEvalue(temp);
-  return NULL;
-}
-// FIXME: complete function
-static TNODE * findBSTNode(bst *tree, void *value) {
-  bstNode *temp = tree->root;
-  while (temp && tree->comparator(temp->value, value) != 0) {
-    if (tree->comparator(temp->value, value) > 0) temp = temp->left;
-    else temp = temp->right;
-  }
-  return temp;
+extern void * findBST(BST *t, void *key) {
+  TNODE * temp = findBSTNode(t, value);
+  if (temp) { return getTNODEvalue(temp); }
+  else { return NULL; }
 }
 /* method returns -1 if given value is not in the tree; 0 otherwise
 * if present, tree node holding given val is removed from tree
 * node is removed by swapping value to a leaf and then pruning the leaf
 * size is decremented
 */
-extern int deleteBST(BST *t, void *key); // FIXME: write function
+extern int deleteBST(BST *t, void *key) {
+  TNODE * temp = findBSTNode(t, key);
+  if (temp) {
+    temp = swapToLeafBST(t, temp); // temp now in leaf
+    pruneLeafBST(t, temp); // prune leaf
+    setBSTsize(t, sizeBST(t)--); // decrement size
+    return 0;
+  }
+  else {
+    return -1; // temp not in tree
+  }
+}
 /* takes a node and recursively swaps its value with its predecessor's (preferred)
 * or its successor's until a leaf node holds the original value.
 * calls the BST’s swapper function to actually accomplish the swap,
@@ -116,21 +118,31 @@ extern int deleteBST(BST *t, void *key); // FIXME: write function
 * The method returns the leaf node holding the swapped value.
 */
 extern TNODE *swapToLeafBST(BST *t, TNODE *node) {
-  if (node == NULL) return node; //error
+  if (node == NULL) return node; // error
   if (isLeaf(node)) return node;
-  TNODE *temp;
+  TNODE *temp = node;
   if (getTNODEleft(temp)) {
-    temp = swapValues(node, findPredecessor(node));
+    temp = swapper(node, findPredecessor(node));
   }
   else {
-    temp = swapValues(node, findSuccessor(node));
+    temp = swapper(node, findSuccessor(node));
   }
-  return swapToLeafBSTNode(temp);
+  return swapToLeafBST(t, temp);
 }
 /* method detaches given node from the tree
 * does not free the node nor decrement size
 */
-extern void pruneLeafBST(BST *t, TNODE *leaf);
+extern void pruneLeafBST(BST *t, TNODE *leaf) {
+  TNODE * parent = getTNODEparent(leaf);
+  if (getTNODEleft(parent) == leaf) { // leaf is left of parent
+    setTNODEleft(parent) = NULL; // detaches leaf from parent
+    setTNODEparent(leaf) = NULL; // detaches parent from leaf
+  }
+  else { // leaf is right of parent
+    setTNODEright(parent) = NULL; // detaches leaf from parent
+    setTNODEparent(leaf) = NULL; // detaches parent from leaf
+  }
+}
 // returns the number of nodes currently in the tree
 extern int sizeBST(BST * t) {
   return t->size;
@@ -208,8 +220,26 @@ extern int debugBST(BST *t, int level); // FIXME: write function
 /* walks through the tree, freeing the nodes and their values if necessary
 * then the tree object itself is freed
 */
-extern void freeBST(BST *t); // FIXME: write function
+extern void freeBST(BST *t) {
+  TNODE * temp = getBSTroot(t)
+  if (temp == NULL) {
+    return;
+  }
+  freeBST(temp->left); // free left subtree first
+  freeBST(temp->right); // free right subtree
+  freeTNODE(temp);
+  free(t);
+}
 ////////////////////////////////////////////////////////////////////////////////
+// FIXME: complete function
+static TNODE * findBSTNode(bst *tree, void *value) {
+  bstNode *temp = getBSTroot(tree);
+  while (temp && tree->comparator(getTNODEvalue(temp), value) != 0) {
+    if (tree->comparator(getTNODEvalue(temp), value) > 0) temp = getTNODEleft(temp);
+    else temp = getTNODEright(temp);
+  }
+  return temp;
+}
 extern void pruneBSTNode(bst *tree, bstNode *n) {
   tree->size--;
   if (isRoot(n)) {
