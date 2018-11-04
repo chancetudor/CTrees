@@ -1,0 +1,17 @@
+debug (in-order): [[2] 3]
+BST:
+0: 3(3)X
+1: =2(3)L
+is 2 present? yes
+debug (in-order): [2]
+BST:
+0: =2(2)X
+is 2 present? yes
+debug (in-order): []
+BST:
+0:
+is 2 present? no
+size: 0
+Nodes: 0
+Minimum depth: -1
+Maximum depth: -1

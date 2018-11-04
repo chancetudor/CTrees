@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "queue.h"
 #include "bst.h"
+#include "tnode.h"
 
 static int isLeftChild(TNODE *);
 static int isRoot(TNODE *);
@@ -19,6 +20,7 @@ static void displayNode(BST *, TNODE *, FILE *);
 static TNODE *swapVals(TNODE *x, TNODE *y);
 static TNODE *getPred(TNODE *n);
 static TNODE *getSucc(TNODE *n);
+static TNODE *findBSTNode(BST *tree, void *key);
 ////////////////////////////////////////////////////////////////////////////////
 // BST constructor
 extern BST * newBST(int (*c)(void * one, void * two)) {
@@ -59,7 +61,7 @@ extern void setBSTsize(BST *t, int s) {
 }
 // inserts a new node into the BST and returns inserted node
 extern TNODE *insertBST(BST *t, void * value) {
-  setBSTsize(t, ++sizeBST(t));
+  setBSTsize(t, sizeBST(t) + 1);
   TNODE * newNode = newTNODE(value, NULL, NULL, NULL);
   assert(newNode != NULL);
   TNODE * temp = getBSTroot(t);
@@ -70,19 +72,22 @@ extern TNODE *insertBST(BST *t, void * value) {
     return newNode;
   }
   while (temp) {
-    newNode->parent = temp;
+    setTNODEparent(newNode, temp);
+    //newNode->parent = temp;
     if (t->comparator(getTNODEvalue(temp), value) == 1) {
-      temp = temp->left;
+      getTNODEleft(temp);
+      //temp = temp->left;
     }
     else {
-      temp = temp->right;
+      getTNODEright(temp);
+      //temp = temp->right;
     }
   }
-  if (tree->comparator(getTNODEvalue(getTNODEparent(newNode)), value) == 1) {
-    setTNODEleft(getTNODEparent(newNode), newNode)
+  if (t->comparator(getTNODEvalue(getTNODEparent(newNode)), value) == 1) {
+    setTNODEleft(getTNODEparent(newNode), newNode);
   }
   else {
-    setTNODEright(getTNODEparent(newNode), newNode)
+    setTNODEright(getTNODEparent(newNode), newNode);
   }
 
   return newNode;
@@ -90,7 +95,7 @@ extern TNODE *insertBST(BST *t, void * value) {
 // returns the value with the searched-for key
 // if key is not in the tree, the method returns null
 extern void * findBST(BST *t, void *key) {
-  TNODE * temp = findBSTNode(t, value);
+  TNODE * temp = findBSTNode(t, key);
   if (temp) { return getTNODEvalue(temp); }
   else { return NULL; }
 }
@@ -102,9 +107,9 @@ extern void * findBST(BST *t, void *key) {
 extern int deleteBST(BST *t, void *key) {
   TNODE * temp = findBSTNode(t, key);
   if (temp) {
-    temp = swapToLeafBST(t, temp); // temp now in leaf
+    temp = swapToLeafBST(t, temp); // temp now a leaf
     pruneLeafBST(t, temp); // prune leaf
-    setBSTsize(t, sizeBST(t)--); // decrement size
+    setBSTsize(t, sizeBST(t) - 1); // decrement size
     return 0;
   }
   else {
@@ -118,14 +123,15 @@ extern int deleteBST(BST *t, void *key) {
 * The method returns the leaf node holding the swapped value.
 */
 extern TNODE *swapToLeafBST(BST *t, TNODE *node) {
+  setBSTswapper(t, (void*)swapVals);
   if (node == NULL) return node; // error
   if (isLeaf(node)) return node;
   TNODE *temp = node;
   if (getTNODEleft(temp)) {
-    temp = swapper(node, findPredecessor(node));
+    /*temp =*/t->swapper(temp, getPred(temp));
   }
   else {
-    temp = swapper(node, findSuccessor(node));
+    /*temp =*/t->swapper(temp, getSucc(temp));
   }
   return swapToLeafBST(t, temp);
 }
@@ -135,12 +141,12 @@ extern TNODE *swapToLeafBST(BST *t, TNODE *node) {
 extern void pruneLeafBST(BST *t, TNODE *leaf) {
   TNODE * parent = getTNODEparent(leaf);
   if (getTNODEleft(parent) == leaf) { // leaf is left of parent
-    setTNODEleft(parent) = NULL; // detaches leaf from parent
-    setTNODEparent(leaf) = NULL; // detaches parent from leaf
+    setTNODEleft(parent, NULL); // detaches leaf from parent
+    setTNODEparent(leaf, NULL); // detaches parent from leaf
   }
   else { // leaf is right of parent
-    setTNODEright(parent) = NULL; // detaches leaf from parent
-    setTNODEparent(leaf) = NULL; // detaches parent from leaf
+    setTNODEright(parent, NULL); // detaches leaf from parent
+    setTNODEparent(leaf, NULL); // detaches parent from leaf
   }
 }
 // returns the number of nodes currently in the tree
@@ -192,7 +198,7 @@ extern void displayBST(BST *t, FILE *fp) {
       }
       else {
         fprintf(fp, " ");
-        displayNode(fp, temp, t);
+        displayTNODE(temp, fp);
         // Its children, if they exist, are enqueued onto the queue,
         // left child, then right child
         if (getTNODEleft(temp)) { enqueue(q, getTNODEleft(temp)); }
@@ -221,35 +227,29 @@ extern int debugBST(BST *t, int level); // FIXME: write function
 * then the tree object itself is freed
 */
 extern void freeBST(BST *t) {
-  TNODE * temp = getBSTroot(t)
-  if (temp == NULL) {
+  TNODE * temp = getBSTroot(t);
+  if (t == NULL) {
     return;
   }
-  freeBST(temp->left); // free left subtree first
-  freeBST(temp->right); // free right subtree
+  temp = getTNODEleft(temp); // free left subtree first
+  temp = getTNODEright(temp); // free right subtree
   freeTNODE(temp);
   free(t);
+  setBSTroot(t, NULL);
 }
 ////////////////////////////////////////////////////////////////////////////////
 // FIXME: complete function
-static TNODE * findBSTNode(bst *tree, void *value) {
-  bstNode *temp = getBSTroot(tree);
-  while (temp && tree->comparator(getTNODEvalue(temp), value) != 0) {
-    if (tree->comparator(getTNODEvalue(temp), value) > 0) temp = getTNODEleft(temp);
-    else temp = getTNODEright(temp);
+static TNODE * findBSTNode(BST *tree, void *key) {
+  TNODE *temp = getBSTroot(tree);
+  while (temp && tree->comparator(getTNODEvalue(temp), key) != 0) {
+    if (tree->comparator(getTNODEvalue(temp), key) > 0) {
+      temp = getTNODEleft(temp);
+    }
+    else {
+      temp = getTNODEright(temp);
+    }
   }
   return temp;
-}
-extern void pruneBSTNode(bst *tree, bstNode *n) {
-  tree->size--;
-  if (isRoot(n)) {
-    tree->root = NULL;
-  }
-  else {
-    if (isLeftChild(n)) n->parent->left = NULL;
-    else n->parent->right = NULL;
-  }
-  deleteNode(n);
 }
 
 static TNODE *swapVals(TNODE *x, TNODE *y) {
@@ -308,10 +308,10 @@ static int findMaxDepth(TNODE *n) {
 static void displayNode(BST *t, TNODE *n, FILE *fp) {
   if (n == NULL) { return; } //error
   if (isLeaf(n)) { fprintf(fp, "="); }
-  tree->displayMethod(fp, getTNODEvalue(n));
+  t->displayMethod(fp, getTNODEvalue(n));
 
   fprintf(fp, "(");
-  tree->displayMethod(fp, getTNODEvalue(getTNODEparent(n)));
+  t->displayMethod(fp, getTNODEvalue(getTNODEparent(n)));
   fprintf(fp, ")");
   if (isLeftChild(n)) {
     fprintf(fp, "L");
@@ -322,21 +322,29 @@ static void displayNode(BST *t, TNODE *n, FILE *fp) {
 }
 
 static int isRightChild(TNODE *n) {
-  if (getTNODEright(getTNODEparent(n)) == n) return 1;
+  if (getTNODEright(getTNODEparent(n)) == n) {
+    return 1;
+  }
   return 0;
 }
 
 static int isLeftChild(TNODE *n) {
-  if (getTNODEleft(getTNODEparent(n)) == n) return 1;
+  if (getTNODEleft(getTNODEparent(n)) == n) {
+    return 1;
+  }
   return 0;
 }
 
 static int isLeaf(TNODE *n) {
-  if (!getTNODEleft(n) && !getTNODEright(n)) return 1;
+  if (getTNODEleft(n) == NULL && getTNODEright(n) == NULL) {
+    return 1;
+  }
   return 0;
 }
 
 static int isRoot(TNODE *n) {
-  if (getTNODEparent(n) == n) return 1;
+  if (getTNODEparent(n) == n) {
+    return 1;
+  }
   return 0;
 }

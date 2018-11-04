@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "vbst.h" // FIXME: change to gst.h
+#include "gst.h" // FIXME: change to gst.h
 #include "rbt.h"
 #include "string.h"
 #include "interpreter.h"

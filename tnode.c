@@ -70,7 +70,7 @@ extern void displayTNODE(TNODE * n, FILE * fp) {
   // case 2: displayMethod == 0 && debugVal > 0
   // case 3: displayMethod != 0 && debugVal == 0
   // case 4: displayMethod != 0 && debugVal > 0
-  if (n->diplayMethod == 0) {
+  if (n->displayMethod == 0) {
     if (n->debugVal == 0) {
       // print "&valueAddress"
       fprintf(fp, "&%p\n", &n->value);
@@ -103,6 +103,6 @@ extern int debugTNODE(TNODE * n, int level) {
 }
 // frees a node
 extern void freeTNODE(TNODE * n) {
-  n->freeMethod(n->value);f
+  n->freeMethod(getTNODEvalue(n));
   free(n);
 }
