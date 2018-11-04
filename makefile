@@ -2,12 +2,12 @@ OOPTS = -g -std=c99 -Wall -Wextra -c
 LOPTS = -g -std=c99 -Wall -Wextra
 CDAOBJS = cda.o test-cda3.o integer.o
 QOBJS = queue.o cda.o test-queue.o integer.o
-BSTOBJS = tnode.o bst.o queue.o cda.o test-bst.o
+BSTOBJS = tnode.o bst.o queue.o cda.o test-bst.o integer.o
 GSTOBJS = tnode.o bst.o gst.o
 RBTOBJS = tnode.o bst.o gst.o rbt.o
 TREESOBJS = tnode.o bst.o gst.o rbt.o string.o interpreter.o
 
-all : cda queue bst gst rbt trees
+all : cda queue bst #gst rbt trees
 cda : $(CDAOBJS)
 	gcc $(LOPTS) $(CDAOBJS) -o cda
 queue : $(QOBJS)
@@ -49,13 +49,13 @@ test : bst #gst rbt trees cda queue
 	#./cda
 	#./stack
 	#./queue
-	#./bst
-#valgrind : maze #da stack cda queue
+	./bst
+valgrind : bst #gst rbt trees cda queue
 	#valgrind --leak-check=full ./da
 	#valgrind --leak-check=full ./cda
 	#valgrind --leak-check=full ./stack
 	#valgrind --leak-check=full ./queue
-#	valgrind --tool=memcheck --leak-check=yes amaze -r 386 -s unready.maze ready.maze -d ready.maze -c 40 28 unready.maze
+	valgrind --tool=memcheck --leak-check=yes bst
 clean :
 	rm -f $(BSTOBJS) $(GSTOBJS) $(RBTOBJS) $(QOBJS) $(CDAOBJS) $(TREESOBJS) \
 	bst gst cda queue rbt trees

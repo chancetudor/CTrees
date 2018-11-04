@@ -18,6 +18,7 @@ typedef struct bst BST;
 struct bst {
   TNODE * root;
   int size;
+  int debugVal;
   CM comparator;
   DM displayMethod;
   SM swapper;
