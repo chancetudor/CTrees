@@ -2,7 +2,7 @@ OOPTS = -g -std=c99 -Wall -Wextra -c
 LOPTS = -g -std=c99 -Wall -Wextra
 CDAOBJS = cda.o test-cda3.o integer.o
 QOBJS = queue.o cda.o test-queue.o integer.o
-BSTOBJS = tnode.o bst.o queue.o cda.o test-bst.o integer.o
+BSTOBJS = tnode.o bst.o queue.o cda.o test-bst.o integer.o real.o
 GSTOBJS = tnode.o bst.o gst.o
 RBTOBJS = tnode.o bst.o gst.o rbt.o
 TREESOBJS = tnode.o bst.o gst.o rbt.o string.o interpreter.o
@@ -23,6 +23,8 @@ bst : $(BSTOBJS)
 #	gcc $(LOPTS) $(TREESOBJS) -o trees
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
+real.o : real.c real.h
+	gcc $(OOPTS) real.c
 string.o : string.c string.h
 	gcc $(OOPTS) string.c
 cda.o : cda.c cda.h
@@ -43,8 +45,10 @@ test-cda3.o : test-cda3.c cda.h
 	gcc $(OOPTS) test-cda3.c
 test-queue.o : test-queue.c queue.h cda.h
 	gcc $(OOPTS) test-queue.c
-test-bst.o : test-bst.c integer.h string.h queue.h bst.h
+test-bst.o : test-bst.c integer.h string.h queue.h bst.h real.h
 	gcc $(OOPTS) test-bst.c
+bst-0-1.o : bst-0-1.c integer.h string.h queue.h bst.h real.h
+	gcc $(OOPTS) bst-0-1.c
 test : bst #gst rbt trees cda queue
 	#./da
 	#./cda
