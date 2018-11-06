@@ -1,0 +1,24 @@
+REAL test of GST, simple
+GST:
+0: 3.000000(3.000000)X
+1: 2.000000<2>(3.000000)L
+2: =1.000000(2.000000<2>)L
+debug: [[[1.000000] 2.000000<2>] 3.000000]
+is 2.000000 present? yes
+deleting 3.000000
+GST:
+0: 2.000000<2>(2.000000<2>)X
+1: =1.000000(2.000000<2>)L
+debug: [[1.000000] 2.000000<2>]
+is 2.000000 present? yes
+deleting 2.000000
+GST:
+0: 2.000000(2.000000)X
+1: =1.000000(2.000000)L
+debug: [[1.000000] 2.000000]
+is 2.000000 present? yes
+size: 2
+Duplicates: 0
+Nodes: 2
+Minimum depth: 0
+Maximum depth: 1

@@ -12,7 +12,7 @@ long int random(void);
 int
 main(void)
     {
-    srandom(1);
+    srandom(12);
     printf("INTEGER test of RBT, simple\n");
     RBT *p = newRBT(compareINTEGER);
     setRBTdisplay(p,displayINTEGER);

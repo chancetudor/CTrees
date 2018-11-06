@@ -1,0 +1,16 @@
+debug (in-order): [[2.000000] 3.000000]
+BST:
+0: 3.000000(3.000000)X
+1: =2.000000(3.000000)L
+is 2.000000 present? yes
+debug (in-order): [2.000000]
+BST:
+0: =2.000000(2.000000)X
+is 2.000000 present? yes
+debug (in-order): []BST:
+0:
+is 2.000000 present? no
+size: 0
+Nodes: 0
+Minimum depth: -1
+Maximum depth: -1

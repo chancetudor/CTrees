@@ -1,0 +1,24 @@
+STRING test of GST, simple
+GST:
+0: a3(a3)X
+1: a2<2>(a3)L
+2: =a1(a2<2>)L
+debug: [[[a1] a2<2>] a3]
+is a2 present? yes
+deleting a3
+GST:
+0: a2<2>(a2<2>)X
+1: =a1(a2<2>)L
+debug: [[a1] a2<2>]
+is a2 present? yes
+deleting a2
+GST:
+0: a2(a2)X
+1: =a1(a2)L
+debug: [[a1] a2]
+is a2 present? yes
+size: 2
+Duplicates: 0
+Nodes: 2
+Minimum depth: 0
+Maximum depth: 1

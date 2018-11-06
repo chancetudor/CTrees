@@ -1,0 +1,24 @@
+INTEGER test of RBT, insertions, then deletions
+RBT:
+0: 5<4>(5<4>)X
+1: 2*<2>(5<4>)L =6<3>(5<4>)R
+2: 0(2*<2>)L 4<2>(2*<2>)R
+3: =1*(0)R =3*(4<2>)L
+debug (in-order): [[[0 [1*]] 2*<2> [[3*] 4<2>]] 5<4> [6<3>]]
+debug (pre-order): [5<4> [2*<2> [0 [1*]] [4<2> [3*]]] [6<3>]]
+debug (post-order): [[[[1*] 0] [[3*] 4<2>] 2*<2>] [6<3>] 5<4>]
+size is 7
+Duplicates: 7
+Nodes: 7
+Minimum depth: 1
+Maximum depth: 3
+RBT:
+0: =3(3)X
+debug (in-order): [3]
+debug (pre-order): [3]
+debug (post-order): [3]
+size is 1
+Duplicates: 0
+Nodes: 1
+Minimum depth: 0
+Maximum depth: 0

@@ -12,7 +12,7 @@ long int random(void);
 int
 main(void)
     {
-    srandom(1);
+    srandom(12);
     printf("INTEGER test of GST, simple\n");
     GST *p = newGST(compareINTEGER);
     setGSTdisplay(p,displayINTEGER);

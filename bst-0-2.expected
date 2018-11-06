@@ -1,0 +1,17 @@
+debug (in-order): [[a2] a3]
+BST:
+0: a3(a3)X
+1: =a2(a3)L
+is a2 present? yes
+debug (in-order): [a2]
+BST:
+0: =a2(a2)X
+is a2 present? yes
+debug (in-order): []
+BST:
+0:
+is a2 present? no
+size: 0
+Nodes: 0
+Minimum depth: -1
+Maximum depth: -1

@@ -1,0 +1,13 @@
+BST:
+0: 10(10)X
+1: 2(10)L =11(10)R
+2: =0(2)L 7(2)R
+3: 5(7)L =9(7)R
+4: =4(5)L
+debug (in-order): [[[0] 2 [[[4] 5] 7 [9]]] 10 [11]]
+debug (pre-order): [10 [2 [0] [7 [5 [4]] [9]]] [11]]
+debug (post-order): [[[0] [[[4] 5] [9] 7] 2] [11] 10]
+size is 8
+Nodes: 8
+Minimum depth: 1
+Maximum depth: 4

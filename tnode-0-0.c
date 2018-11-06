@@ -12,7 +12,7 @@ long int random(void);
 int
 main(void)
     {
-    srandom(1);
+    srandom(12);
     printf("INTEGER test of TNODE, simple\n");
     TNODE *p = newTNODE(newINTEGER(1),0,0,0);
     setTNODEdisplay(p,displayINTEGER);

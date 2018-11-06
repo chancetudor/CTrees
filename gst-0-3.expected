@@ -1,0 +1,20 @@
+INTEGER test of GST, insertions
+GST:
+0: 5<2>(5<2>)X
+1: 0<2>(5<2>)L
+2: 3<2>(0<2>)R
+3: 2<2>(3<2>)L =4<3>(3<2>)R
+4: =1<2>(2<2>)L
+debug (in-order): 0: 5<2>(5<2>)X
+1: 0<2>(5<2>)L
+2: 3<2>(0<2>)R
+3: 2<2>(3<2>)L =4<3>(3<2>)R
+4: =1<2>(2<2>)L
+
+debug (pre-order): [5<2> [0<2> [3<2> [2<2> [1<2>]] [4<3>]]]]
+debug (post-order): [[[[[1<2>] 2<2>] [4<3>] 3<2>] 0<2>] 5<2>]
+size is 6
+Duplicates: 7
+Nodes: 6
+Minimum depth: 0
+Maximum depth: 4

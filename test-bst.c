@@ -38,7 +38,7 @@ main(void)
         freeINTEGER(x);
         }
     debugBST(p,1);
-    printf("debug (in-order): ");
+    /*printf("debug (in-order): ");
     displayBST(p,stdout);
     printf("\n");
     debugBST(p,0);
@@ -68,6 +68,6 @@ main(void)
     statisticsBST(p,stdout);
     freeINTEGER(q);
     freeINTEGER(r);
-    freeBST(p);
+    freeBST(p);*/
     return 0;
     }

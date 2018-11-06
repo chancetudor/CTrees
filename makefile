@@ -8,6 +8,7 @@ RBTOBJS = tnode.o bst.o gst.o rbt.o
 TREESOBJS = tnode.o bst.o gst.o rbt.o string.o interpreter.o
 
 all : cda queue bst #gst rbt trees
+
 cda : $(CDAOBJS)
 	gcc $(LOPTS) $(CDAOBJS) -o cda
 queue : $(QOBJS)
