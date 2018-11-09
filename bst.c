@@ -17,7 +17,7 @@ static int isLeaf(TNODE *n);
 static int findMinDepth(TNODE *n);
 static int findMaxDepth(TNODE *n);
 static int getDebugVal(BST *t);
-static int min(int x, int y);
+//static int min(int x, int y);
 static void displayNode(BST *t, TNODE *n, FILE *fp);
 static void displayLevel(BST *t, FILE *fp);
 static void displayInOrder(BST *t, TNODE *n, FILE *fp);
@@ -38,7 +38,7 @@ extern BST * newBST(int (*c)(void * one, void * two)) {
   tree->debugVal = 0;
   tree->comparator = c;
   tree->displayMethod = 0;
-  tree->swapper = 0;
+  tree->swapper = (void *)swapVals;
   tree->freeMethod = 0;
 
   return tree;
@@ -73,6 +73,7 @@ extern TNODE *insertBST(BST *t, void * value) {
   TNODE * newNode = newTNODE(value, 0, 0, 0);
   assert(newNode != NULL);
   setTNODEfree(newNode, (void *)t->freeMethod);
+  setTNODEdisplay(newNode, (void *)t->displayMethod);
   TNODE * temp = getBSTroot(t);
 
   // If tree is empty: set root, return
@@ -83,7 +84,7 @@ extern TNODE *insertBST(BST *t, void * value) {
   }
   while (temp != 0) {
     setTNODEparent(newNode, temp);
-    if (t->comparator(getTNODEvalue(getTNODEparent(newNode)), value) == 1) {
+    if (t->comparator(getTNODEvalue(getTNODEparent(newNode)), value) >= 1) {
       // value of newNode's parent > value being inserted, so go left
       temp = getTNODEleft(temp);
     }
@@ -92,7 +93,7 @@ extern TNODE *insertBST(BST *t, void * value) {
       temp = getTNODEright(temp);
     }
   }
-  if (t->comparator(getTNODEvalue(getTNODEparent(newNode)), value) == 1) {
+  if (t->comparator(getTNODEvalue(getTNODEparent(newNode)), value) >= 1) {
     // value of parent > value being inserted
     // so newNode is left child of its parent
     setTNODEleft(getTNODEparent(newNode), newNode);
@@ -148,7 +149,9 @@ extern int deleteBST(BST *t, void *key) {
 * The method returns the leaf node holding the swapped value.
 */
 extern TNODE *swapToLeafBST(BST *t, TNODE *node) {
-  setBSTswapper(t, (void*)swapVals);
+  if (t->swapper == 0) {
+    setBSTswapper(t, (void*)swapVals);
+  }
   if (node == 0) return node; // error
   if (isLeaf(node)) return node;
   TNODE *temp = node;
@@ -198,6 +201,10 @@ extern void statisticsBST(BST *t, FILE *fp) {
   if (sizeBST(t) == 0) {
     minDepth = -1;
     maxDepth = -1;
+  }
+  else if (sizeBST(t) == 1) {
+    minDepth = 0;
+    maxDepth = 0;
   }
   else {
     minDepth = findMinDepth(getBSTroot(t));
@@ -251,8 +258,8 @@ extern int debugBST(BST *t, int level) {
 
   return prevVal;
 }
-/* walks through the tree, freeing the nodes and their values if necessary
-* then the tree object itself is freed
+/* walks through the tree, freeing the nodes & their values if necessary
+* then tree object itself is freed
 */
 extern void freeBST(BST *t) {
   TNODE * temp = getBSTroot(t);
@@ -307,12 +314,12 @@ static TNODE *getSucc(TNODE *n) {
   while (getTNODEleft(temp)) temp = getTNODEleft(temp);
   return temp;
 }
-
+// looks for a node with at least one null child
 static int findMinDepth(TNODE *n) {
   if (n == 0) {
-    return -1;
+    return 0;
   }
-  if (getTNODEleft(n) == 0 && getTNODEright(n) == 0) {
+  /*if (getTNODEleft(n) == 0 && getTNODEright(n) == 0) {
     return 1;
   }
   if (getTNODEleft(n) == 0) {
@@ -322,9 +329,9 @@ static int findMinDepth(TNODE *n) {
     return findMinDepth(getTNODEleft(n)) + 1;
   }
 
-  return min(findMinDepth(getTNODEleft(n)), findMinDepth(getTNODEright(n))) + 1;
+  return min(findMinDepth(getTNODEleft(n)), findMinDepth(getTNODEright(n))) + 1;*/
 
-  /*int rightDepth = findMinDepth(getTNODEright(n));
+  int rightDepth = findMinDepth(getTNODEright(n));
   int leftDepth = findMinDepth(getTNODEleft(n));
 
   if (rightDepth < leftDepth) {
@@ -332,7 +339,7 @@ static int findMinDepth(TNODE *n) {
   }
   else {
     return leftDepth + 1;
-  }*/
+  }
 }
 
 static int findMaxDepth(TNODE *n) {
@@ -383,7 +390,7 @@ static void displayLevel(BST *t, FILE *fp) {
     fprintf(fp, "%d:", level);
     if (getBSTroot(t) != 0) {
       enqueue(q, getBSTroot(t));
-      enqueue(q, 0);
+      enqueue(q, NULL);
     }
     while (sizeQUEUE(q) != 0) {
       // 1st elem in queue is dequeued and displayed
@@ -392,7 +399,7 @@ static void displayLevel(BST *t, FILE *fp) {
         if (sizeQUEUE(q)) {
           fprintf(fp, "\n");
           fprintf(fp, "%d:", ++level);
-          enqueue(q, 0);
+          enqueue(q, NULL);
         }
       }
       else {
@@ -428,7 +435,7 @@ static void displayInOrder(BST * t, TNODE * n, FILE * fp) {
   }
   TNODE * left = getTNODEleft(n);
   TNODE * right = getTNODEright(n);
-  //displayInOrder(t, left, fp); // recur left subtree first
+  displayInOrder(t, left, fp); // recur left subtree first
 
   if (left != 0 && right != 0) { // left and right subtree exists
     fprintf(fp, "["); // outer bracket
@@ -466,7 +473,7 @@ static void displayInOrder(BST * t, TNODE * n, FILE * fp) {
     fprintf(fp, "]"); // outer bracket
   }
 
-  //displayInOrder(t, right, fp); // then right subtree
+  displayInOrder(t, right, fp); // then right subtree
 }
 /*
 * @ any given node, method displays left and right subtrees, each enclosed by
@@ -610,12 +617,12 @@ static void displayNode(BST *t, TNODE *n, FILE *fp) {
   }
 }
 
-static int min(int x, int y) {
+/*static int min(int x, int y) {
   if (x < y) {
     return x;
   }
   else { return y; }
-}
+}*/
 
 static int isRightChild(TNODE *n) {
   if (getTNODEright(getTNODEparent(n)) == n) {

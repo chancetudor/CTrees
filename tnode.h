@@ -8,10 +8,8 @@ typedef void (*FM)(void * ptr);
 typedef void (*DM)(void * ptr, FILE *fp);
 typedef struct tnode TNODE;
 struct tnode {
-  //void * key; // FIXME: need?
   void * value;
   int debugVal;
-  //int freq; // FIXME: need?
   TNODE * left;
   TNODE * right;
   TNODE * parent;
