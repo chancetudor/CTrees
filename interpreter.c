@@ -1,5 +1,5 @@
 /*File: interpreter.c
- *Author: Emily Turner
+ *Author: Chance Tudor
  *Implements functions found in interpreter.h in order to populate a binary tree with the text found in the corpus text file
  *Also reads in a command text file in order to manipulate and display statistics about the tree
  */

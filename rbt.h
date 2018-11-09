@@ -1,28 +1,33 @@
-/*** red-black binary search tree class ***/
-
-#include <stdio.h>
-#include "bst.h"
+/*** RBT binary search tree class ***/
 
 #ifndef __RBT_INCLUDED__
 #define __RBT_INCLUDED__
 
-typedef struct rbt
-        {
-        bst *tree;
-        void (*display)(FILE *,void *);
-        int (*compare)(void *,void *);
-        int size; //redundant
-        int words;
-        } rbt;
+#include <stdio.h>
+#include "tnode.h"
 
-extern rbt *newRBT(void (*)(FILE *,void *),int (*)(void *,void *));
-extern void insertRBT(rbt *,void *);
-extern int findRBT(rbt *,void *);
-extern void deleteRBT(rbt *,void *);
-extern int sizeRBT(rbt *);
-extern int wordsRBT(rbt *);
-extern void statisticsRBT(rbt *,FILE *);
-extern void displayRBT(FILE *,rbt *);
-extern void checkRBT(rbt *);               //optional
+typedef struct rbt RBT;
 
-#endif
+extern RBT   *newRBT(int (*c)(void *,void *));
+extern void   setRBTdisplay(RBT *t,void (*d)(void *,FILE *));
+extern void   setRBTswapper(RBT *t,void (*s)(TNODE *,TNODE *));
+extern void   setRBTfree(RBT *t,void (*)(void *));
+extern TNODE *getRBTroot(RBT *t);
+extern void   setRBTroot(RBT *t,TNODE *replacement);
+extern void   setRBTsize(RBT *t,int s);
+extern TNODE *insertRBT(RBT *t,void *value);
+extern void  *findRBT(RBT *t,void *key);
+extern TNODE *locateRBT(RBT *t,void *key);
+extern int    deleteRBT(RBT *t,void *key);
+extern TNODE *swapToLeafRBT(RBT *t,TNODE *node);
+extern void   pruneLeafRBT(RBT *t,TNODE *leaf);
+extern int    sizeRBT(RBT *t);
+extern void   statisticsRBT(RBT *t,FILE *fp);
+extern void   displayRBT(RBT *t,FILE *fp);
+extern int    debugRBT(RBT *t,int level);
+extern void   freeRBT(RBT *t);
+extern void   *unwrapRBT(TNODE *n);
+extern int    freqRBT(RBT *g,void *key);
+extern int    duplicatesRBT(RBT *g);
+
+#endif /* rbt.h */

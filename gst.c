@@ -110,7 +110,6 @@ extern TNODE *insertGST(GST *t, void *value) {
     if (t->freeMethod != 0) {
       t->freeMethod(value);
     }
-    freeGVAL(newVal);
     return 0;
   }
   setGSTitems(t, getGSTitems(t) + 1);
