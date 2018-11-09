@@ -7,6 +7,17 @@
 #include <assert.h>
 #include "tnode.h"
 
+struct tnode {
+  void * value;
+  int debugVal;
+  TNODE * left;
+  TNODE * right;
+  TNODE * parent;
+  FM freeMethod;
+  DM displayMethod;
+};
+
+
 extern TNODE * newTNODE(void * val, TNODE * l, TNODE * r, TNODE * p) {
   TNODE * node = malloc(sizeof(TNODE));
   assert(node != NULL);

@@ -7,15 +7,6 @@ typedef void (*FM)(void * ptr);
 // stores a displayMethod function pointer in TNODE struct
 typedef void (*DM)(void * ptr, FILE *fp);
 typedef struct tnode TNODE;
-struct tnode {
-  void * value;
-  int debugVal;
-  TNODE * left;
-  TNODE * right;
-  TNODE * parent;
-  FM freeMethod;
-  DM displayMethod;
-};
 
 extern TNODE *newTNODE(void *v, TNODE *l, TNODE *r, TNODE *p);
 extern void   setTNODEdisplay(TNODE *n, void (*d)(void *value,FILE *fp));

@@ -16,14 +16,6 @@ typedef void (*SM)(TNODE * one, TNODE * two);
 // stores a freeMethod function pointer in GST struct
 typedef void (*FM)(void * ptr);
 typedef struct gst GST;
-struct gst {
-  BST * tree;
-  int items;
-  DM display;
-  CM compare;
-  FM freeMethod;
-  SM swap;
-};
 
 extern GST   *newGST(int (*c)(void *,void *));
 extern void   setGSTdisplay(GST *t,void (*d)(void *,FILE *));

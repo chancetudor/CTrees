@@ -1,5 +1,3 @@
-/*** common binary search tree class ***/
-
 #ifndef __BST_INCLUDED__
 #define __BST_INCLUDED__
 
@@ -15,15 +13,6 @@ typedef void (*SM)(TNODE * one, TNODE * two);
 // stores a freeMethod function pointer in BST struct
 typedef void (*FM)(void * ptr);
 typedef struct bst BST;
-struct bst {
-  TNODE * root;
-  int size;
-  int debugVal;
-  CM comparator;
-  DM displayMethod;
-  SM swapper;
-  FM freeMethod;
-};
 
 extern BST *newBST(int (*c)(void *,void *));
 extern void   setBSTdisplay(BST *t, void (*d)(void *,FILE *));

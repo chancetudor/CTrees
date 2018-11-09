@@ -56,8 +56,8 @@ test : bst gst #rbt trees cda queue
 	#./cda
 	#./stack
 	#./queue
-	./bst
-	./gst
+	#./bst
+	valgrind --tool=memcheck --leak-check=yes ./gst
 valgrind : bst gst #rbt trees cda queue
 	#valgrind --leak-check=full ./da
 	#valgrind --leak-check=full ./cda

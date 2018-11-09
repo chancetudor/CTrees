@@ -10,6 +10,16 @@
 #include "bst.h"
 #include "tnode.h"
 
+struct bst {
+  TNODE * root;
+  int size;
+  int debugVal;
+  CM comparator;
+  DM displayMethod;
+  SM swapper;
+  FM freeMethod;
+};
+
 static int isLeftChild(TNODE *n);
 static int isRoot(TNODE *n);
 static int isRightChild(TNODE *n);
