@@ -17,7 +17,6 @@ int main(int argc, char **argv) {
   int author = 0, green = 0, rbt = 0;
   if (argc != 4) {
     printf("Error! Usage: %s -flag corpus_file command_file\n", argv[0]);
-    //exit(1);
   }
 
   for (int i = 1; i < argc; ++i) {
@@ -33,14 +32,14 @@ int main(int argc, char **argv) {
 
   // FIXME
   if (green) {
-    GST * tree = newVBST(displayString, stringComparator); // change to GST
-    VBSTInterpreter(argv, outFile, tree); // change to GST
-    // FIXME: free *tree
+    GST * tree = newGST(stringComparator);
+    GSTInterpreter(argv, outFile, tree);
+    freeGST(tree);
   }
-  else if (rbt) {
-    RBT * tree = newRBT(displayString, stringComparator);
+  else if (rbt == 1 || (rbt == 0) && (gst == 0)) {
+    RBT * tree = newRBT(stringComparator);
     RBTInterpreter(argv, outFile, tree);
-    // FIXME: free *tree
+    freeRBT(tree);
   }
   else {
     printf("Error: invalid flag. Valid flags are: '-v' | '-g' | '-r'\n");

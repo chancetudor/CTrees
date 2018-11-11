@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include "rbt.h"
-#include "vbst.h"
+#include "gst.h"
 
 #ifndef _INTERPRETER_INCLUDED_
 #define _INTERPRETER_INCLUDED_
 
-void RBTInterpreter(char **argv, FILE *outfp, rbt *tree);
-void VBSTInterpreter(char **argv, FILE *outfp, vbst *tree);
+void RBTInterpreter(RBT *tree, char **argv, FILE *outfp);
+void GSTInterpreter(GST *tree, char **argv, FILE *outfp);
 
 #endif // _INTERPRETER_INCLUDED_

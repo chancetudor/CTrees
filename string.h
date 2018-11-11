@@ -1,13 +1,15 @@
-/*File: string.h
- *Author: Emily Turner
- *Contains the headers for functions based on the char * data type
- */
-#ifndef _STRING_INCLUDED_
-#define _STRING_INCLUDED_
+#ifndef __STRING_INCLUDED__
+#define __STRING_INCLUDED__
 
 #include <stdio.h>
 
-void displayString(FILE *,void *);
-int stringComparator(void *v, void *w);
+typedef struct STRING STRING;
+
+extern STRING *newSTRING(char*);
+extern char* getSTRING(STRING *);
+extern char* setSTRING(STRING *,char*);
+extern int compareSTRING(void *,void *);
+extern void displaySTRING(void *,FILE *);
+extern void freeSTRING(void *);
 
 #endif

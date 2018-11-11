@@ -5,14 +5,6 @@
 #include "bst.h"
 #include "tnode.h"
 
-// stores a comparator function pointer in GST struct
-typedef int (*CM)(void * one, void * two);
-// stores a displayMethod function pointer in GST struct
-typedef void (*DM)(void * ptr, FILE *fp);
-// stores a swapper function pointer in GST struct
-typedef void (*SM)(TNODE * one, TNODE * two);
-// stores a freeMethod function pointer in GST struct
-typedef void (*FM)(void * ptr);
 struct gst {
   BST * tree;
   int items;
@@ -149,6 +141,7 @@ extern int deleteGST(GST *t, void *key) {
   int freq = freqGST(t, key); // var to hold freq count of GSTVAL
   BST * tree = t->tree;
   if (freq == 0) { // GSTVAL is not in tree
+    printf("Error: node with key not found\n");
     return -1;
   }
   else if (freq > 1) { // multiple GSTVALs w/ same value in tree

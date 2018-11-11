@@ -164,6 +164,7 @@ extern int deleteRBT(RBT *t, void *key) { // FIXME
   int freq = freqRBT(t, key);
   GST * tree = t->tree;
   if (freq == 0) {
+    printf("Error: node with key not found\n");
     return -1;
   }
   else if (freq > 1) {
@@ -178,7 +179,7 @@ extern int deleteRBT(RBT *t, void *key) { // FIXME
   deletionFixUp(tree, node);
   pruneLeafGST(tree, node);
   setRBTitems(t, getRBTitems(t) - 1);
-  free(node);
+  //freeTNODE(node);
   return 0;
 }
 
@@ -440,12 +441,18 @@ static int isRed(TNODE *n) {
 
 static void colorBlack(TNODE *n) {
   //RBTVAL *v = getTNODEvalue(n);
-  RBTVAL *v = unwrapGST(n);
-  setColor(v, 1);
+  if (n == 0) {
+    RBTVAL *v = unwrapGST(n);
+    setColor(v, 1);
+  }
+  return;
 }
 
 static void colorRed(TNODE *n) {
   //RBTVAL *v = getTNODEvalue(n);
+  if (n == 0) {
+    return;
+  }
   RBTVAL *v = unwrapGST(n);
   setColor(v, 0);
 }
@@ -531,6 +538,9 @@ static TNODE *parent(TNODE *n) {
 }
 
 static TNODE *uncle(TNODE *n) {
+  if (parent(n) == 0 || grandparent(n) == 0) {
+    return 0;
+  }
   if (isLeftChild(parent(n))) {
     return getTNODEright(grandparent(n));
   }
@@ -540,6 +550,9 @@ static TNODE *uncle(TNODE *n) {
 }
 
 static TNODE *niece(TNODE *n) {
+  if (parent(n) == 0 || sibling(n) == 0) {
+    return 0;
+  }
   if (isLeftChild(n)) {
     return getTNODEleft(sibling(n));
   }
@@ -549,7 +562,9 @@ static TNODE *niece(TNODE *n) {
 }
 
 static TNODE *nephew(TNODE *n) {
-  
+  if (parent(n) == 0 || sibling(n) == 0) {
+    return 0;
+  }
   if (isLeftChild(n)) {
     return getTNODEright(sibling(n));
   }

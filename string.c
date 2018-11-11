@@ -1,19 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <assert.h>
 #include <string.h>
 #include "string.h"
 
+struct STRING{
+    char* value;
+};
 
-void
-displayString(FILE *fp,void *v)
-    {
-    fprintf(fp,"\"%s\"",(char *) v);
-    }
+STRING* newSTRING(char* x){
+    STRING *p = malloc(sizeof(STRING));
+    assert(p != 0);
+    p->value = x;
+    return p;
+}
 
-int stringComparator(void *v, void *w)
-{
-    /*if (strcmp((char *) v,(char *) w) > 0) return 1;
-    else if (strcmp((char *) v,(char *) w) < 0) return -1;
-    else return 0;*/
-    return strcmp((char *) v,(char *) w);
+char* getSTRING(STRING *v){
+    return v->value;
+}
+
+char* setSTRING(STRING *v,char* x){
+    char* old = v->value;
+    strcpy(v->value, x);
+    return old;
+}
+
+void displaySTRING(void *v,FILE *fp){
+    fprintf(fp,"%s",getSTRING((STRING*) v));
+}
+
+int compareSTRING(void *v,void *w){
+    return strcmp(getSTRING(v),getSTRING(w));
+}
+
+void freeSTRING(void *v){
+    free((STRING *) v);
 }
