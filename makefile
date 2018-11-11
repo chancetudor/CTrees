@@ -51,6 +51,8 @@ bst-0-1.o : bst-0-1.c integer.h string.h queue.h bst.h real.h
 	gcc $(OOPTS) bst-0-1.c
 gst-0-0.o : gst-0-0.c integer.h string.h queue.h bst.h real.h
 	gcc $(OOPTS) gst-0-0.c
+rbt-0-0.o : rbt-0-0.c gst.h rbt.h integer.h real.h string.h
+	gcc $(OOPTS) rbt-0-0.c
 test : bst gst rbt #trees cda queue
 	#./da
 	#./cda

@@ -33,8 +33,10 @@ struct gstval {
 };
 
 static TNODE * findGSTNode(GST *t, void *key);
+
 static int getGSTitems(GST *t);
 static int compareGVAL(void * x, void * y);
+
 static void displayGVAL(GSTVAL *v, FILE *fp);
 static void freeGVAL(GSTVAL *v);
 static void setGSTitems(GST *t, int i);
@@ -53,7 +55,7 @@ extern GST * newGST(int (*c)(void * one, void * two)) {
 
   return gTree;
 }
-static GSTVAL *newGSTVAL(GST *t, void *v) {
+static GSTVAL * newGSTVAL(GST *t, void *v) {
   GSTVAL * value = malloc(sizeof(GSTVAL));
   value->val = v;
   value->freq = 0;

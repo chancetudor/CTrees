@@ -26,32 +26,40 @@ struct rbtval {
   int color;
   DM display;
   CM compare;
+  SM swap;
+  FM freeMethod;
 };
 
-static RBTVAL *newRBTVAL(RBT *t, void * v);
+static RBTVAL *newRBTVAL(RBT *t, void *v);
 
 static TNODE *grandparent(TNODE *n);
 static TNODE *parent(TNODE *n);
 static TNODE *uncle(TNODE *n);
-static TNODE * findRBTNode(RBT *t, void *key);
+static TNODE *niece(TNODE *n);
+static TNODE *nephew(TNODE *n);
+static TNODE *sibling(TNODE *n);
+static TNODE *findRBTNode(RBT *t, void *key);
 
 static int compareRBTVAL(void *a, void *b);
 static int isBlack(TNODE *n);
 static int isRed(TNODE *n);
+static int getColor(RBTVAL *v);
 static int linearWithParent(TNODE *n);
 static int isLeftChild(TNODE *n);
 static int isRoot(TNODE *n);
 static int isRightChild(TNODE *n);
 static int getRBTitems(RBT *t);
 
-static void displayRBTVAL(void *n, FILE *fp);
-static void insertionFixUp(TNODE *n, GST *tree);
+static void displayRBTVAL(RBTVAL *v, FILE *fp);
+static void insertionFixUp(GST *tree, TNODE * n);
+static void deletionFixUp(GST * tree, TNODE * n);
 static void swapVals(TNODE *a, TNODE *b);
 static void freeRBTVAL(RBTVAL *v);
 static void colorBlack(TNODE *n);
 static void colorRed(TNODE *n);
-static void rightRotate(TNODE *n, GST *tree);
-static void leftRotate(TNODE *n, GST *tree);
+static void setColor(RBTVAL *v, int c);
+static void rightRotate(GST *tree, TNODE *n);
+static void leftRotate(GST *tree, TNODE * n);
 static void setRBTFreq(RBTVAL *v, int f);
 static void setRBTitems(RBT *t, int i);
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +84,8 @@ static RBTVAL *newRBTVAL(RBT *t, void * val) {
   v->value = val;
   v->display = t->display;
   v->compare = t->compare;
+  v->swap = t->swap;
+  v->freeMethod = t->freeMethod;
 
   return v;
 }
@@ -128,7 +138,8 @@ extern TNODE * insertRBT(RBT *t, void *value) {
   setRBTFreq(newVal, newVal->freq + 1);
   GST * tree = t->tree;
   temp = insertGST(tree, newVal);
-  insertionFixUp(temp, tree);
+  //colorRed(temp);
+  insertionFixUp(tree, temp);
   return temp;
 }
 
@@ -148,14 +159,25 @@ extern TNODE *locateRBT(RBT *t, void *key) {
   return locateGST(tree, key);
 }
 
-extern int deleteRBT(RBT *t, void *value) { // FIXME
-  RBTVAL *v = newRBTVAL(t, value);
-  RBTVAL *rootVal = getTNODEvalue(getGSTroot(t->tree));
-  fprintf(stderr, "Error: cannot delete value ");
-  v->display(stderr, v->value);
-  fprintf(stderr, " from tree rooted at ");
-  rootVal->display(stderr, rootVal->value);
-  fprintf(stderr, "\n");
+extern int deleteRBT(RBT *t, void *key) { // FIXME
+  setRBTswapper(t, (void *)swapVals);
+  int freq = freqRBT(t, key);
+  GST * tree = t->tree;
+  if (freq == 0) {
+    return -1;
+  }
+  else if (freq > 1) {
+    RBTVAL * v = newRBTVAL(t, key);
+    --freq;
+    return deleteGST(tree, v);
+  }
+  RBTVAL * newVal = newRBTVAL(t, key); // FIXME: Free
+  TNODE * node = findRBTNode(t, newVal);
+  node = swapToLeafGST(tree, node);
+  deletionFixUp(tree, node);
+  pruneLeafGST(tree, node);
+  setRBTitems(t, getRBTitems(t) - 1);
+  return 0;
 }
 
 extern TNODE *swapToLeafRBT(RBT *t, TNODE *node) {
@@ -237,8 +259,8 @@ static TNODE * findRBTNode(RBT *t, void *key) {
   if (temp == 0 || sizeGST(tree) == 0) {
     return 0;
   }
-  while (temp && compareRBTVAL(getTNODEvalue(temp), key) != 0) {
-    if (compareRBTVAL(getTNODEvalue(temp), key) > 0) {
+  while (temp && compareRBTVAL(unwrapGST(temp), key) != 0) {
+    if (compareRBTVAL(unwrapGST(temp), key) > 0) {
       temp = getTNODEleft(temp);
     }
     else {
@@ -248,18 +270,27 @@ static TNODE * findRBTNode(RBT *t, void *key) {
   return temp;
 }
 
-static void displayRBTVAL(void *n, FILE *fp) {
-  RBTVAL *v = n;
-  v->display(fp, v->value);
-  if (v->freq > 1) fprintf(fp, "-%d", v->freq);
-  if (v->color == 1) fprintf(fp, "-B");
-  else fprintf(fp, "-R");
+static void displayRBTVAL(RBTVAL *v, FILE *fp) {
+  void * val = v->value;
+  v->display(val, fp);
+  if (v->freq > 1) {
+    fprintf(fp, "<%d>", v->freq);
+  }
+  if (getColor(v) == 0) {
+    fprintf(fp, "*"); // color is red
+  }
+  //else fprintf(fp, "*");
 }
 
 static int compareRBTVAL(void *x, void *y) {
   RBTVAL *a = x;
   RBTVAL *b = y;
   return a->compare(a->value, b->value);
+}
+
+static void freeRBTVAL(RBTVAL *v) {
+  v->freeMethod(v->value);
+  free(v);
 }
 
 static void setRBTFreq(RBTVAL * v, int f) {
@@ -274,10 +305,14 @@ static int getRBTitems(RBT *t) {
   return t->items;
 }
 
-static void insertionFixUp(TNODE *n, GST *tree) {
+static void insertionFixUp(GST *tree, TNODE * n) {
   while (1) {
-    if (isRoot(n)) break;
-    if (isBlack(parent(n))) return;
+    if (isRoot(n)) {
+      break;
+    }
+    if (isBlack(parent(n))) {
+      break;
+    }
     if (isRed(uncle(n))) {
       colorBlack(parent(n));
       colorBlack(uncle(n));
@@ -285,128 +320,258 @@ static void insertionFixUp(TNODE *n, GST *tree) {
       n = grandparent(n);
     }
     else {
-      if (!linearWithParent(n)) {
+      if (linearWithParent(n) == 0) {
         if (isRightChild(n)) {
-          leftRotate(n, tree);
+          leftRotate(tree, n);
           //n = n->left;
-          getTNODEleft(n);
+          n = getTNODEleft(n);
         }
         else {
-          rightRotate(n, tree);
+          rightRotate(tree, n);
           //n = n->right;
-          getTNODEright(n);
+          n = getTNODEright(n);
         }
       }
       colorBlack(parent(n));
       colorRed(grandparent(n));
-      if (isLeftChild(getTNODEparent(n))) {
-        rightRotate(getTNODEparent(n), tree);
+      if (isLeftChild(parent(n))) {
+        rightRotate(tree, parent(n));
       }
       else {
-        leftRotate(getTNODEparent(n), tree);
+        leftRotate(tree, parent(n));
       }
       break;
     }
   }
-  if (isRed(getGSTroot(tree))) colorBlack(getGSTroot(tree));
+  colorBlack(getGSTroot(tree));
+}
+
+static void deletionFixUp(GST * tree, TNODE * n) {
+  while (1) {
+    if (isRoot(n)) {
+      break;
+    }
+    if (isRed(n)) {
+      break;
+    }
+    if (isRed(sibling(n))) {
+      colorRed(parent(n)); // color parent red
+      colorBlack(sibling(n)); // color sibling black
+      // rotate sibling to parent
+      if (isLeftChild(sibling(n))) {
+        //rightRotate(tree, parent(n));
+        rightRotate(tree, sibling(n));
+      }
+      else {
+        leftRotate(tree, parent(n));
+      }
+    }
+    else if (isRed(nephew(n))) {
+      int color = getColor(getTNODEvalue(parent(n)));
+      setColor(getTNODEvalue(sibling(n)), color);
+      colorBlack(parent(n));
+      colorBlack(nephew(n));
+      // rotate sibling to parent
+      if (isLeftChild(sibling(n))) {
+        rightRotate(tree, parent(n));
+      }
+      else {
+        leftRotate(tree, parent(n));
+      }
+    }
+    else if (isRed(niece(n))) {
+      colorBlack(niece(n));
+      colorRed(sibling(n));
+      // rotate niece to sibling
+      if (isLeftChild(niece(n))) {
+        rightRotate(tree, sibling(n));
+      }
+      else {
+        leftRotate(tree, sibling(n));
+      }
+    }
+    else { // sibling, niece, and nephew must be black
+      colorRed(sibling(n));
+      setTNODEparent(n, parent(n));
+    }
+  }
+  colorBlack(n);
+}
+
+static int getColor(RBTVAL *v) {
+  return v->color;
+}
+
+static void setColor(RBTVAL *v, int c) {
+  v->color = c;
 }
 
 static int isBlack(TNODE *n) {
   if (n) {
     RBTVAL *v = getTNODEvalue(n);
-    return v->color;
+    if (getColor(v) == 1) {
+      return 1;
+    }
   }
-  return 1;
+  return 0;
 }
 
 static int isRed(TNODE *n) {
   if (n) {
     RBTVAL *v = getTNODEvalue(n);
-    if (v->color == 0) return 1;
+    if (getColor(v) == 0) {
+      return 1;
+    }
   }
   return 0;
 }
 
 static void colorBlack(TNODE *n) {
-  RBTVAL *v = getTNODEvalue(n);
-  v->color = 1;
+  //RBTVAL *v = getTNODEvalue(n);
+  RBTVAL *v = unwrapGST(n);
+  setColor(v, 1);
 }
 
 static void colorRed(TNODE *n) {
-  RBTVAL *v = getTNODEvalue(n);
-  v->color = 0;
+  //RBTVAL *v = getTNODEvalue(n);
+  RBTVAL *v = unwrapGST(n);
+  setColor(v, 0);
 }
 
-static void rightRotate(TNODE *n, GST *tree) {
+static void rightRotate(GST *tree, TNODE * n) {
   TNODE *oldParent = parent(n);
   if (isRoot(oldParent)) {
     setGSTroot(tree, n);
   }
   else if (isLeftChild(oldParent)) {
-    grandparent(n)->left = n;
+    //grandparent(n)->left = n;
+    setTNODEleft(grandparent(n), n);
   }
   else {
-    grandparent(n)->right = n;
+    //grandparent(n)->right = n;
+    setTNODEright(grandparent(n), n);
   }
-  if (isRoot(oldParent)) n->parent = n;
-  else n->parent = grandparent(n);
-  oldParent->left = n->right;
-  if (oldParent->left) {
-    oldParent->left->parent = oldParent;
+  if (isRoot(oldParent)) {
+    //n->parent = n;
+    setTNODEparent(n, n);
   }
-  n->right = oldParent;
-  oldParent->parent = n;
+  else {
+    //n->parent = grandparent(n);
+    setTNODEparent(n, grandparent(n));
+  }
+  //oldParent->left = n->right;
+  setTNODEleft(oldParent, getTNODEright(n));
+  if (getTNODEleft(oldParent)) {
+    //oldParent->left->parent = oldParent;
+    setTNODEparent(getTNODEleft(oldParent), oldParent);
+  }
+  //n->right = oldParent;
+  setTNODEright(n, oldParent);
+  setTNODEparent(oldParent, n);
+  //oldParent->parent = n;
 }
 
-static void leftRotate(TNODE *n, GST *tree) {
-  TNODE *oldParent = n->parent;
+static void leftRotate(GST *tree, TNODE *n) {
+  TNODE *oldParent = parent(n);
   if (isRoot(oldParent)) {
-    tree->root = n;
+    setGSTroot(tree, n);
   }
   else if (isLeftChild(oldParent)) {
-    grandparent(n)->left = n;
+    setTNODEleft(grandparent(n), n);
   }
   else {
-    grandparent(n)->right = n;
+    setTNODEright(grandparent(n), n);
   }
-  if (isRoot(oldParent)) n->parent = n;
-  else n->parent = grandparent(n);
-  oldParent->right = n->left;
-  if (oldParent->right) {
-    oldParent->right->parent = oldParent;
+  if (isRoot(oldParent)) {
+    setTNODEparent(n, n);
   }
-  n->left = oldParent;
-  oldParent->parent = n;
+  else {
+    setTNODEparent(n, grandparent(n));
+  }
+  setTNODEright(oldParent, getTNODEleft(n));
+  if (getTNODEright(oldParent)) {
+    setTNODEparent(getTNODEright(oldParent), oldParent);
+  }
+  setTNODEleft(n, oldParent);
+  setTNODEparent(oldParent, n);
 }
 
 static int isLeftChild(TNODE *n) {
-  if (n->parent->left == n) return 1;
+  if (getTNODEleft(parent(n)) == n) {
+    return 1;
+  }
   return 0;
 }
 
 static int isRightChild(TNODE *n) {
-  if (n->parent->right == n) return 1;
+  if (getTNODEright(parent(n)) == n) {
+    return 1;
+  }
   return 0;
 }
 
 static TNODE *grandparent(TNODE *n) {
-  return n->parent->parent;
+  return parent(parent(n));
 }
 
 static TNODE *parent(TNODE *n) {
-  return n->parent;
+  return getTNODEparent(n);
 }
+
 static TNODE *uncle(TNODE *n) {
-  if (isLeftChild(n->parent)) return grandparent(n)->right;
-  else return grandparent(n)->left;
+  if (isLeftChild(parent(n))) {
+    return getTNODEright(grandparent(n));
+  }
+  else {
+    return getTNODEleft(grandparent(n));
+  }
+}
+
+static TNODE *niece(TNODE *n) {
+  if (isLeftChild(n)) {
+    return getTNODEleft(sibling(n));
+  }
+  else {
+    return getTNODEright(sibling(n));
+  }
+}
+
+static TNODE *nephew(TNODE *n) {
+  if (isLeftChild(n)) {
+    return getTNODEright(sibling(n));
+  }
+  else {
+    return getTNODEleft(sibling(n));
+  }
+}
+
+static TNODE *sibling(TNODE * n) {
+  if (isLeftChild(n)) {
+    return getTNODEright(parent(n));
+  }
+  else {
+    return getTNODEleft(parent(n));
+  }
 }
 
 static int linearWithParent(TNODE *n) {
-  if ((isRightChild(n) && isRightChild(parent(n))) || (isLeftChild(n) && isLeftChild(parent(n)))) return 1;
-  else return 0;
+  /*if ((isRightChild(n) && isRightChild(parent(n))) ||
+      (isLeftChild(n) && isLeftChild(parent(n)))) {
+    return 1;
+  }*/
+  if (isRightChild(n) && isRightChild(parent(n))) {
+    return 1;
+  }
+  else if (isLeftChild(n) && isLeftChild(parent(n))) {
+    return 1;
+  }
+
+  return 0;
 }
 
 static int isRoot(TNODE *n) {
-  if (n->parent == n) return 1;
+  if (parent(n) == n) {
+    return 1;
+  }
   return 0;
 }
