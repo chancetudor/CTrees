@@ -138,7 +138,7 @@ extern TNODE * insertRBT(RBT *t, void *value) {
   setRBTFreq(newVal, newVal->freq + 1);
   GST * tree = t->tree;
   temp = insertGST(tree, newVal);
-  //colorRed(temp);
+  colorRed(temp);
   insertionFixUp(tree, temp);
   return temp;
 }
@@ -169,13 +169,14 @@ extern int deleteRBT(RBT *t, void *key) { // FIXME
   else if (freq > 1) {
     RBTVAL * v = newRBTVAL(t, key);
     --freq;
+    setRBTFreq(v, freq);
     return deleteGST(tree, v);
   }
   RBTVAL * newVal = newRBTVAL(t, key); // FIXME: Free
   TNODE * node = findRBTNode(t, newVal);
-  node = swapToLeafGST(tree, node);
-  deletionFixUp(tree, node);
-  pruneLeafGST(tree, node);
+  TNODE * ptr = swapToLeafGST(tree, node);
+  deletionFixUp(tree, ptr);
+  pruneLeafGST(tree, ptr);
   setRBTitems(t, getRBTitems(t) - 1);
   return 0;
 }
@@ -396,6 +397,9 @@ static void deletionFixUp(GST * tree, TNODE * n) {
     }
   }
   colorBlack(n);
+  if (!isBlack(getGSTroot(tree))) {
+    colorBlack(getGSTroot(tree));
+  }
 }
 
 static int getColor(RBTVAL *v) {
