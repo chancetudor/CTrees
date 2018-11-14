@@ -34,14 +34,14 @@ main(void)
     printf(" present? %s\n",findRBT(p,q) == 0? "no" : "yes");
     INTEGER *r = newINTEGER(3);
     printf("deleting %d\n",getINTEGER(r));
-    if (freqRBT(p,r) > 1)
+    if (freqRBT(p,r) > 1) {
         deleteRBT(p,r);
-    else
-        {
+      }
+    else {
         INTEGER *x = findRBT(p,r);
         deleteRBT(p,r);
         freeINTEGER(x);
-        }
+    }
     debugRBT(p,0);
     printf("RBT:\n");
     displayRBT(p,stdout);
@@ -54,8 +54,9 @@ main(void)
     printf(" present? %s\n",findRBT(p,q) == 0? "no" : "yes");
     setINTEGER(r,2);
     printf("deleting %d\n",getINTEGER(r));
-    if (freqRBT(p,r) > 1)
+    if (freqRBT(p,r) > 1) {
         deleteRBT(p,r);
+      }
     else
         {
         INTEGER *x = findRBT(p,r);

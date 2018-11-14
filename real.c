@@ -30,7 +30,7 @@ void displayREAL(void *v,FILE *fp){
 	return;
 }
 
-double compareREAL(void *v,void *w){
+int compareREAL(void *v,void *w){
     return getREAL(v) - getREAL(w);
 }
 

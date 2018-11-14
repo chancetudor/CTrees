@@ -19,8 +19,17 @@ main(void)
     setBSTfree(p,freeINTEGER);
     insertBST(p,newINTEGER(3));
     insertBST(p,newINTEGER(2));
+    insertBST(p,newINTEGER(4));
     debugBST(p,1);
     printf("debug (in-order): ");
+    displayBST(p,stdout);
+    printf("\n");
+    debugBST(p,2);
+    printf("debug (pre-order): ");
+    displayBST(p,stdout);
+    printf("\n");
+    debugBST(p,3);
+    printf("debug (post-order): ");
     displayBST(p,stdout);
     printf("\n");
     debugBST(p,0);

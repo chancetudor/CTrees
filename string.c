@@ -22,7 +22,7 @@ char* getSTRING(STRING *v){
 
 char* setSTRING(STRING *v,char* x){
     char* old = v->value;
-    strcpy(v->value, x);
+    v->value = x;
     return old;
 }
 

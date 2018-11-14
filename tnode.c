@@ -4,7 +4,6 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "tnode.h"
 
 struct tnode {
@@ -17,10 +16,11 @@ struct tnode {
   DM displayMethod;
 };
 
-
 extern TNODE * newTNODE(void * val, TNODE * l, TNODE * r, TNODE * p) {
   TNODE * node = malloc(sizeof(TNODE));
-  assert(node != NULL);
+  if (node == 0) {
+    printf("Error: memory for node not allocated.\n");
+  }
   node->value = val;
   //node->key = 0; // FIXME: need?
   //node->freq = 0; // FIXME: need?
@@ -114,6 +114,8 @@ extern int debugTNODE(TNODE * n, int level) {
 }
 // frees a node
 extern void freeTNODE(TNODE * n) {
-  n->freeMethod(getTNODEvalue(n));
+  if (n->freeMethod) {
+    n->freeMethod(n->value);
+  }
   free(n);
 }

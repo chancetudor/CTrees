@@ -44,20 +44,19 @@ main(void)
         }
     printf("size is %d\n",sizeGST(p));
     statisticsGST(p,stdout);
-    for (i = 0; i < 14; ++i)
-        {
-        int j = random() % 7;
-        INTEGER *a = newINTEGER(j);
-        if (freqGST(p,a) > 1)
-            deleteGST(p,a);
-        else
-            {
-            INTEGER *x = findGST(p,a);
-            deleteGST(p,a);
-            freeINTEGER(x);
-            }
-        freeINTEGER(a);
-        }
+    for (i = 0; i < 14; ++i) {
+      int j = random() % 7;
+      INTEGER *a = newINTEGER(j);
+      if (freqGST(p,a) > 1) {
+        deleteGST(p,a);
+      }
+      else {
+        INTEGER *x = findGST(p,a);
+        deleteGST(p,a);
+        freeINTEGER(x);
+      }
+      freeINTEGER(a);
+    }
     if (sizeGST(p) < 200)
         {
         debugGST(p,0);
