@@ -5,33 +5,34 @@
 #include "bst.h"
 #include "tnode.h"
 
+typedef struct gstval GSTVAL;
+
 struct gst {
   BST * tree;
-  int insertions;
+  int duplicates;
   DM display;
   CM compare;
   FM freeMethod;
   SM swap;
 };
 
-typedef struct gstval GSTVAL;
 struct gstval {
   void * val;
   int freq;
   DM display;
   CM compare;
   FM freeMethod;
-  SM swap;
+  //SM swap;
 };
 
 static TNODE * findGSTNode(GST *t, void *key);
 
-static int getGSTinsertions(GST *t);
+static int getGSTduplicates(GST *t);
 static int compareGVAL(void * x, void * y);
 
 static void displayGVAL(GSTVAL *v, FILE *fp);
 static void freeGVAL(GSTVAL *v);
-static void setGSTinsertions(GST *t, int i);
+static void setGSTduplicates(GST *t, int i);
 static void setGSTFreq(GSTVAL * v, int f);
 static void swapVals(TNODE *x, TNODE *y);
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,7 @@ static void swapVals(TNODE *x, TNODE *y);
 extern GST * newGST(int (*c)(void * one, void * two)) {
   GST * gTree = malloc(sizeof(GST));
   gTree->tree = newBST((void *)compareGVAL);
-  gTree->insertions = 0;
+  gTree->duplicates = 0;
   gTree->display = 0;
   gTree->compare = c;
   gTree->freeMethod = 0;
@@ -54,7 +55,7 @@ static GSTVAL * newGSTVAL(GST *t, void *v) {
   value->display = t->display;
   value->compare = t->compare;
   value->freeMethod = t->freeMethod;
-  value->swap = t->swap;
+  //value->swap = t->swap;
 
   return value;
 }
@@ -85,6 +86,7 @@ extern TNODE *getGSTroot(GST *t) {
 extern void setGSTroot(GST *t, TNODE *replacement) {
   BST * tree = t->tree;
   setBSTroot(tree, replacement);
+  setTNODEparent(replacement, replacement);
 }
 // sets size of GST
 extern void setGSTsize(GST *t, int s) {
@@ -98,16 +100,16 @@ extern void setGSTsize(GST *t, int s) {
 extern TNODE *insertGST(GST *t, void *value) {
   GSTVAL * newVal = newGSTVAL(t, value); // FIXME: Free
   TNODE * temp = findGSTNode(t, newVal);
-  if (temp != NULL) {
+  if (temp) {
     newVal = (GSTVAL *)getTNODEvalue(temp);
     setGSTFreq(newVal, newVal->freq + 1);
-    setGSTinsertions(t, getGSTinsertions(t) + 1);
+    setGSTduplicates(t, getGSTduplicates(t) + 1);
     if (t->freeMethod != 0) {
       t->freeMethod(value);
     }
     return 0;
   }
-  setGSTinsertions(t, getGSTinsertions(t) + 1);
+  //setGSTduplicates(t, getGSTduplicates(t) + 1);
   setGSTFreq(newVal, newVal->freq + 1);
   BST * tree = t->tree;
   return insertBST(tree, newVal);
@@ -120,9 +122,10 @@ extern void *findGST(GST *t, void *key) {
   if (temp == 0) {
     return 0;
   }
-  void * val = unwrapGST(temp);
-  free(v);
-  return val;
+  //void * val = unwrapGST(temp);
+  //free(v);
+  //return val;
+  return unwrapGST(temp);
 }
 // returns the tree node holding the searched-for key.
 // If the key is not in the tree, the method returns null.
@@ -138,28 +141,23 @@ extern TNODE *locateGST(GST *t, void *key) {
 * If freq count == 1, GST value is removed from tree (i.e. zero is returned).
 */
 extern int deleteGST(GST *t, void *key) {
-  printf("in deleteGST\n");
-  //setGSTswapper(t, (void *)swapVals);
   int freq = freqGST(t, key); // var to hold freq count of GSTVAL
   BST * tree = t->tree;
   if (freq == 0) { // GSTVAL is not in tree
-    printf("\tnode not found in tree\n");
     return -1;
   }
   else if (freq > 1) { // multiple GSTVALs w/ same value in tree
-    printf("\tnode has freq > 1\n");
     GSTVAL * newVal = newGSTVAL(t, key); // FIXME: Free
     TNODE * node = findGSTNode(t, newVal);
     GSTVAL * ptr = (GSTVAL *)getTNODEvalue(node);
     --freq;
     setGSTFreq(ptr, freq);
-    setGSTinsertions(t, getGSTinsertions(t) - 1);
-    //freeGVAL(newVal);
+    setGSTduplicates(t, getGSTduplicates(t) - 1);
+    //free(newVal);
     return freq;
   }
-  printf("\tnode freq == 1\n");
   GSTVAL * v = newGSTVAL(t, key); // FIXME: Free
-  setGSTinsertions(t, getGSTinsertions(t) - 1);
+  //setGSTduplicates(t, getGSTduplicates(t) - 1);
   return deleteBST(tree, v);
 }
 /* recursively swaps a node's value with its predecessor's (preferred)
@@ -185,7 +183,7 @@ extern int sizeGST(GST *t) {
   return sizeBST(tree);
 }
 // displays number of duplicates
-// == # GST insertions - # nodes in underlying BST
+// == # GST duplicates - # nodes in underlying BST
 // Then calls BST statistics method
 extern void statisticsGST(GST *t, FILE *fp) {
   BST * tree = t->tree;
@@ -205,6 +203,7 @@ extern int debugGST(GST *t, int level) {
 extern void freeGST(GST *t) {
   BST * tree = t->tree;
   freeBST(tree);
+  free(t);
 }
 // extracts the GST value from a node
 // From that extracted value, returns generic value wrapped by GST value
@@ -219,17 +218,14 @@ extern int freqGST(GST *g, void *key) {
   TNODE * n = findGSTNode(g, v);
   if (n) {
     v = (GSTVAL *)getTNODEvalue(n);
-    int f = v->freq;
-    return f;
+    return v->freq;
   }
-  //freeGVAL(v);
   return 0;
 }
 // returns the number of duplicate values currently in the tree
-// == # GST insertions - # nodes in underlying BST
+// == # GST duplicates - # nodes in underlying BST
 extern int duplicatesGST(GST *g) {
-  BST * tree = g->tree;
-  return getGSTinsertions(g) - sizeBST(tree);
+  return getGSTduplicates(g);
 }
 ////////////////////////////////////////////////////////////////////////////////
 static void swapVals(TNODE *x, TNODE *y) {
@@ -277,12 +273,12 @@ static void freeGVAL(GSTVAL *v) {
   free(v);
 }
 
-static int getGSTinsertions(GST * t) {
-  return t->insertions;
+static int getGSTduplicates(GST * t) {
+  return t->duplicates;
 }
 
-static void setGSTinsertions(GST * t, int i) {
-  t->insertions = i;
+static void setGSTduplicates(GST * t, int i) {
+  t->duplicates = i;
 }
 
 static void setGSTFreq(GSTVAL *v, int f) {

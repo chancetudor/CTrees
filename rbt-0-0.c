@@ -32,16 +32,22 @@ main(void)
     printf("is ");
     displayINTEGER(q,stdout);
     printf(" present? %s\n",findRBT(p,q) == 0? "no" : "yes");
+    printf("size: %d\n",sizeRBT(p));
+    statisticsRBT(p,stdout);
     INTEGER *r = newINTEGER(3);
     printf("deleting %d\n",getINTEGER(r));
     if (freqRBT(p,r) > 1) {
+      printf("in main: freq > 1\n");
         deleteRBT(p,r);
       }
     else {
+      printf("in main: freq <= 1\n");
         INTEGER *x = findRBT(p,r);
         deleteRBT(p,r);
         freeINTEGER(x);
     }
+    printf("size: %d\n",sizeRBT(p));
+    statisticsRBT(p,stdout);
     debugRBT(p,0);
     printf("RBT:\n");
     displayRBT(p,stdout);
@@ -52,6 +58,8 @@ main(void)
     printf("is ");
     displayINTEGER(q,stdout);
     printf(" present? %s\n",findRBT(p,q) == 0? "no" : "yes");
+    printf("size: %d\n",sizeRBT(p));
+    statisticsRBT(p,stdout);
     setINTEGER(r,2);
     printf("deleting %d\n",getINTEGER(r));
     if (freqRBT(p,r) > 1) {
@@ -63,6 +71,8 @@ main(void)
         deleteRBT(p,r);
         freeINTEGER(x);
         }
+    printf("size: %d\n",sizeRBT(p));
+    statisticsRBT(p,stdout);
     debugRBT(p,0);
     printf("RBT:\n");
     displayRBT(p,stdout);
@@ -73,6 +83,8 @@ main(void)
     printf("is ");
     displayINTEGER(q,stdout);
     printf(" present? %s\n",findRBT(p,q) == 0? "no" : "yes");
+    printf("size: %d\n",sizeRBT(p));
+    statisticsRBT(p,stdout);
     printf("deleting %d\n",getINTEGER(r));
     if (freqRBT(p,r) > 1)
         deleteRBT(p,r);
@@ -82,6 +94,8 @@ main(void)
         deleteRBT(p,r);
         freeINTEGER(x);
         }
+    printf("size: %d\n",sizeRBT(p));
+    statisticsRBT(p,stdout);
     debugRBT(p,0);
     printf("RBT:\n");
     displayRBT(p,stdout);

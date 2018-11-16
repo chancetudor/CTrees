@@ -2,9 +2,9 @@ OOPTS = -g -std=c99 -Wall -Wextra -c
 LOPTS = -g -std=c99 -Wall -Wextra
 CDAOBJS = cda.o test-cda3.o integer.o
 QOBJS = queue.o cda.o test-queue.o integer.o
-BSTOBJS = tnode.o bst.o queue.o cda.o bst-0-12.o string.o real.o integer.o
-GSTOBJS = tnode.o bst.o queue.o cda.o gst.o gst-0-10.o integer.o real.o
-RBTOBJS = tnode.o bst.o queue.o cda.o gst.o rbt-0-0.o integer.o real.o rbt.o
+BSTOBJS = tnode.o bst.o queue.o cda.o bst-0-3.o string.o real.o integer.o
+GSTOBJS = tnode.o bst.o queue.o cda.o gst.o gst-0-4.o integer.o real.o string.o
+RBTOBJS = tnode.o bst.o queue.o cda.o gst.o rbt-0-0.o string.o integer.o real.o rbt.o
 #TREESOBJS = tnode.o bst.o gst.o rbt.o string.o interpreter.o
 
 all : cda queue bst gst rbt #trees
@@ -47,10 +47,10 @@ test-cda3.o : test-cda3.c cda.h
 	gcc $(OOPTS) test-cda3.c
 test-queue.o : test-queue.c queue.h cda.h
 	gcc $(OOPTS) test-queue.c
-bst-0-12.o : bst-0-12.c string.h queue.h bst.h integer.h real.h
-	gcc $(OOPTS) bst-0-12.c
-gst-0-10.o : gst-0-10.c integer.h string.h queue.h bst.h real.h
-	gcc $(OOPTS) gst-0-10.c
+bst-0-3.o : bst-0-3.c string.h queue.h bst.h integer.h real.h
+	gcc $(OOPTS) bst-0-3.c
+gst-0-4.o : gst-0-4.c integer.h string.h queue.h bst.h real.h
+	gcc $(OOPTS) gst-0-4.c
 rbt-0-0.o : rbt-0-0.c gst.h rbt.h integer.h real.h string.h
 	gcc $(OOPTS) rbt-0-0.c
 test : rbt gst bst #trees cda queue
@@ -58,8 +58,8 @@ test : rbt gst bst #trees cda queue
 	#./cda
 	#./stack
 	#./queue
-	#./bst
-	#./gst
+	./bst
+	./gst
 	./rbt
 valgrind : bst gst rbt #trees cda queue
 	#valgrind --leak-check=full ./da
@@ -72,3 +72,7 @@ valgrind : bst gst rbt #trees cda queue
 clean :
 	rm -f $(BSTOBJS) $(GSTOBJS) $(RBTOBJS) $(QOBJS) $(CDAOBJS) $(TREESOBJS) \
 	bst gst cda queue rbt trees
+copy :
+	#cp ../objects/bst.o .
+	#cp ../objects/gst.o .
+	cp ../objects/rbt.o .

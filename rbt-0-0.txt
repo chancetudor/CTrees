@@ -17,6 +17,7 @@ RBT:
 debug: [[1*] 2]
 is 2 present? yes
 deleting 2
+
 RBT:
 0: =1(1)X
 debug: [1]

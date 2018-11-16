@@ -461,8 +461,6 @@ static void displayLevel(BST *t, FILE *fp) {
 * empty tree displayed as []
 * example:
 * [[7] 20 [33]]
-* [20 [7] [33]]
-* [[7] [33] 20]
 */
 static void displayInOrder(BST * t, TNODE * n, FILE * fp) { // FIXME
   if (t == 0 || sizeBST(t) == 0) { // empty tree
@@ -481,7 +479,23 @@ static void displayInOrder(BST * t, TNODE * n, FILE * fp) { // FIXME
   fprintf(fp, "["); // outer bracket
   displayInOrder(t, getTNODEleft(n), fp); // recur left subtree first
 
+  if (getTNODEright(n) && getTNODEleft(n)) {
+    fprintf(fp, " ");
+  }
+
+  if (!getTNODEright(n) && getTNODEleft(n)) {
+    fprintf(fp, " ");
+  }
+
   t->displayMethod(getTNODEvalue(n), fp); // curr node
+
+  if (getTNODEright(n) && getTNODEleft(n)) {
+    fprintf(fp, " ");
+  }
+
+  if (getTNODEright(n) && !getTNODEleft(n)) {
+    fprintf(fp, " ");
+  }
 
   displayInOrder(t, getTNODEright(n), fp); // then right subtree
   fprintf(fp, "]"); // outer bracket
@@ -492,9 +506,7 @@ static void displayInOrder(BST * t, TNODE * n, FILE * fp) { // FIXME
 * space is printed by displayBST to separate any existing subtrees/node values
 * empty tree displayed as []
 * example:
-* [[7] 20 [33]]
-* [20 [7] [33]]
-* [[7] [33] 20]
+* [20 [7] [33]] pre
 */
 static void displayPreOrder(BST *t, TNODE *n, FILE *fp) { // FIXME
   if (t == 0 || sizeBST(t) == 0) { // empty tree
@@ -510,8 +522,9 @@ static void displayPreOrder(BST *t, TNODE *n, FILE *fp) { // FIXME
   if (n == 0) {
     return;
   }
-  // FIXME: space should not be immediate
-  fprintf(fp, " ["); // outer bracket
+
+  if (n == getBSTroot(t)) { fprintf(fp, "["); } // outer bracket
+  else { fprintf(fp, " ["); } // outer bracket
 
   t->displayMethod(getTNODEvalue(n), fp); // curr node
 
@@ -526,8 +539,6 @@ static void displayPreOrder(BST *t, TNODE *n, FILE *fp) { // FIXME
 * space is printed by displayBST to separate any existing subtrees/node values
 * empty tree displayed as []
 * example:
-* [[7] 20 [33]]
-* [20 [7] [33]]
 * [[7] [33] 20]
 */
 static void displayPostOrder(BST *t, TNODE *n, FILE *fp) {
