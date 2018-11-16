@@ -101,12 +101,13 @@ extern TNODE *insertGST(GST *t, void *value) {
   GSTVAL * newVal = newGSTVAL(t, value); // FIXME: Free
   TNODE * temp = findGSTNode(t, newVal);
   if (temp) {
-    newVal = (GSTVAL *)getTNODEvalue(temp);
-    setGSTFreq(newVal, newVal->freq + 1);
+    GSTVAL * ptr = (GSTVAL *)getTNODEvalue(temp);
+    setGSTFreq(ptr, ptr->freq + 1);
     setGSTduplicates(t, getGSTduplicates(t) + 1);
     if (t->freeMethod != 0) {
       t->freeMethod(value);
     }
+    free(newVal);
     return 0;
   }
   //setGSTduplicates(t, getGSTduplicates(t) + 1);
@@ -116,16 +117,17 @@ extern TNODE *insertGST(GST *t, void *value) {
 }
 // returns the value stored with the given key
 // returns null if the key is not in the tree.
-extern void *findGST(GST *t, void *key) {
+extern void * findGST(GST *t, void *key) {
   GSTVAL * v = newGSTVAL(t, key); // FIXME: Free
   TNODE * temp = findGSTNode(t, v);
   if (temp == 0) {
+    free(v);
     return 0;
   }
-  //void * val = unwrapGST(temp);
-  //free(v);
-  //return val;
-  return unwrapGST(temp);
+  void * val = unwrapGST(temp);
+  free(v);
+  return val;
+  //return unwrapGST(temp);
 }
 // returns the tree node holding the searched-for key.
 // If the key is not in the tree, the method returns null.
@@ -153,7 +155,7 @@ extern int deleteGST(GST *t, void *key) {
     --freq;
     setGSTFreq(ptr, freq);
     setGSTduplicates(t, getGSTduplicates(t) - 1);
-    //free(newVal);
+    free(newVal);
     return freq;
   }
   GSTVAL * v = newGSTVAL(t, key); // FIXME: Free
@@ -217,9 +219,11 @@ extern int freqGST(GST *g, void *key) {
   GSTVAL * v = newGSTVAL(g, key); // FIXME: free
   TNODE * n = findGSTNode(g, v);
   if (n) {
-    v = (GSTVAL *)getTNODEvalue(n);
-    return v->freq;
+    GSTVAL * ptr = (GSTVAL *)getTNODEvalue(n);
+    free(v);
+    return ptr->freq;
   }
+  free(v);
   return 0;
 }
 // returns the number of duplicate values currently in the tree

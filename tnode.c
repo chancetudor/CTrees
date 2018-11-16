@@ -18,7 +18,7 @@ struct tnode {
 
 extern TNODE * newTNODE(void * val, TNODE * l, TNODE * r, TNODE * p) {
   TNODE * node = malloc(sizeof(TNODE));
-  if (node == 0) {
+  if (node == NULL) {
     printf("Error: memory for node not allocated.\n");
   }
   node->value = val;
