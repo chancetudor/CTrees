@@ -5,9 +5,9 @@ QOBJS = queue.o cda.o test-queue.o integer.o
 BSTOBJS = tnode.o bst.o queue.o cda.o bst-0-3.o string.o real.o integer.o
 GSTOBJS = tnode.o bst.o queue.o cda.o gst.o gst-0-4.o integer.o real.o string.o
 RBTOBJS = tnode.o bst.o queue.o cda.o gst.o rbt-0-0.o string.o integer.o real.o rbt.o
-#TREESOBJS = tnode.o bst.o gst.o rbt.o string.o interpreter.o
+TREESOBJS = tnode.o bst.o gst.o rbt.o cda.o queue.o string.o real.o integer.o scanner.o interpreter.o trees.o
 
-all : cda queue bst gst rbt #trees
+all : cda queue bst gst rbt trees
 
 cda : $(CDAOBJS)
 	gcc $(LOPTS) $(CDAOBJS) -o cda
@@ -19,30 +19,32 @@ gst : $(GSTOBJS)
 	gcc $(LOPTS) $(GSTOBJS) -o gst
 rbt : $(RBTOBJS)
 	gcc $(LOPTS) $(RBTOBJS) -o rbt
-#trees : $(TREESOBJS)
-#	gcc $(LOPTS) $(TREESOBJS) -o trees
+trees : $(TREESOBJS)
+	gcc $(LOPTS) $(TREESOBJS) -o trees
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
 real.o : real.c real.h
 	gcc $(OOPTS) real.c
 string.o : string.c string.h
 	gcc $(OOPTS) string.c
+scanner.o : scanner.c scanner.h
+	gcc $(OOPTS) scanner.c
 cda.o : cda.c cda.h
 	gcc $(OOPTS) cda.c
 queue.o : queue.c queue.h cda.h
 	gcc $(OOPTS) queue.c
 tnode.o : tnode.c tnode.h
 	gcc $(OOPTS) tnode.c
-#interpreter.o : interpreter.c interpreter.h rbt.h gst.h
-	#gcc $(OOPTS) interpreter.c
+interpreter.o : interpreter.c interpreter.h rbt.h gst.h
+	gcc $(OOPTS) interpreter.c
 bst.o : bst.c bst.h tnode.h queue.h
 	gcc $(OOPTS) bst.c
 gst.o : gst.c gst.h bst.h tnode.h queue.h
 	gcc $(OOPTS) gst.c
 rbt.o : rbt.c rbt.h tnode.h gst.h
 	gcc $(OOPTS) rbt.c
-#trees.o : trees.c gst.h rbt.h string.h interpreter.h
-#	gcc $(OOPTS) trees.c
+trees.o : trees.c gst.h rbt.h string.h interpreter.h
+	gcc $(OOPTS) trees.c
 test-cda3.o : test-cda3.c cda.h
 	gcc $(OOPTS) test-cda3.c
 test-queue.o : test-queue.c queue.h cda.h

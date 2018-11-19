@@ -45,14 +45,14 @@ void readRBTCommands(RBT *tree, char *filename, FILE *outfp) {
   while (!feof(fp)) {
     switch (c) {
       case 's':
-        displayRBT(outfp, tree);
+        displayRBT(tree, outfp);
         break;
       case 'r':
         statisticsRBT(tree, outfp);
         break;
       case 'f':
         str = readString(fp);
-        freq = findRBT(tree, str);
+        freq = freqRBT(tree, str);
         fprintf(outfp, "Frequency of \"%s\": %d\n", str, freq);
         break;
       case 'd':
@@ -66,7 +66,7 @@ void readRBTCommands(RBT *tree, char *filename, FILE *outfp) {
         }
         break;
     }
-    c = fgetc(fp); ////
+    c = fgetc(fp);
   }
   fclose(fp);
 }
@@ -105,14 +105,14 @@ void readGSTCommands(GST *tree, char *filename, FILE *outfp) {
   while (!feof(fp)) {
     switch (c) {
       case 's':
-        displayGST(outfp, tree);
+        displayGST(tree, outfp);
         break;
       case 'r':
         statisticsGST(tree, outfp);
         break;
       case 'f':
         str = readString(fp);
-        freq = findGST(tree, str);
+        freq = freqGST(tree, str);
         fprintf(outfp, "Frequency of \"%s\": %d\n", str, freq);
         break;
       case 'd':

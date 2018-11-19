@@ -32,13 +32,13 @@ int main(int argc, char **argv) {
 
   // FIXME
   if (green) {
-    GST * tree = newGST(stringComparator);
-    GSTInterpreter(argv, outFile, tree);
+    GST * tree = newGST(compareSTRING);
+    GSTInterpreter(tree, argv, stdout);
     freeGST(tree);
   }
-  else if (rbt == 1 || (rbt == 0) && (gst == 0)) {
-    RBT * tree = newRBT(stringComparator);
-    RBTInterpreter(argv, outFile, tree);
+  else if (rbt == 1 || (rbt == 0 && green == 0)) {
+    RBT * tree = newRBT(compareSTRING);
+    RBTInterpreter(tree, argv, stdout);
     freeRBT(tree);
   }
   else {
