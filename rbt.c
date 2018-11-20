@@ -1,4 +1,4 @@
-/*File: RBT.c
+/*File: rbt.c
  *Author: Chance Tudor
  *Implements functions found in RBT.h in order to implement a red black tree
  */
@@ -8,6 +8,15 @@
 #include "gst.h"
 #include "rbt.h"
 #include "tnode.h"
+
+// stores a comparator function pointer in BST struct
+typedef int (*CM)(void * one, void * two);
+// stores a displayMethod function pointer in BST struct
+typedef void (*DM)(void * ptr, FILE *fp);
+// stores a swapper function pointer in BST struct
+typedef void (*SM)(TNODE * one, TNODE * two);
+// stores a freeMethod function pointer in BST struct
+typedef void (*FM)(void * ptr);
 
 typedef struct rbtval RBTVAL;
 
@@ -24,7 +33,6 @@ struct rbtval {
   int color;
   DM display;
   CM compare;
-  //SM swap;
   FM freeMethod;
 };
 
@@ -76,7 +84,6 @@ static RBTVAL *newRBTVAL(RBT *t, void * val) {
   v->value = val;
   v->display = t->display;
   v->compare = t->compare;
-  //v->swap = t->swap;
   v->freeMethod = t->freeMethod;
 
   return v;
@@ -107,8 +114,9 @@ extern TNODE * getRBTroot(RBT *t) {
 
 extern void setRBTroot(RBT *t, TNODE *replacement) {
   GST * tree = t->tree;
-  setGSTroot(tree, replacement);
   setTNODEparent(replacement, replacement);
+  setGSTroot(tree, replacement);
+  //setTNODEparent(replacement, replacement);
 }
 
 extern void setRBTsize(RBT *t, int s) {
@@ -132,10 +140,10 @@ extern void * findRBT(RBT *t, void *value) {
   if (n == 0) {
     return 0;
   }
-  //void * val = unwrapRBT(n);
-  //free(newVal);
-  //return val;
-  return unwrapRBT(n);
+  void * val = unwrapRBT(n);
+  free(newVal);
+  return val;
+  //return unwrapRBT(n);
 }
 
 extern TNODE *locateRBT(RBT *t, void *key) {
@@ -153,13 +161,17 @@ extern int deleteRBT(RBT *t, void *key) {
     RBTVAL * v = newRBTVAL(t, key);
     return deleteGST(tree, v);
   }
-  RBTVAL * newVal = newRBTVAL(t, key); // FIXME: Free
+
+  RBTVAL * newVal = newRBTVAL(t, key);
   TNODE * node = findRBTNode(t, newVal);
   node = swapToLeafRBT(t, node);
   deletionFixUp(tree, node);
-  pruneLeafRBT(t, node);
+  newVal = unwrapGST(node); // stores RBTVAL inside node
+  pruneLeafRBT(t, node); // frees GSTVAL
+  setTNODEfree(node, 0); // does not set a freeMethod for TNODE
+  freeTNODE(node); // frees the node
+  free(newVal); // frees the RBTVAL
   setRBTsize(t, sizeRBT(t) - 1);
-  //free(newVal);
   return 0;
 }
 
@@ -208,7 +220,7 @@ extern int freqRBT(RBT *g, void *key) {
   RBTVAL * newVal = newRBTVAL(g, key);
   GST * tree = g->tree;
   int freq = freqGST(tree, newVal);
-  //free(newVal);
+  free(newVal);
   return freq;
 }
 

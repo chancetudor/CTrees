@@ -1,304 +1,203 @@
-//
-//  cda.c
-//  A generic circular dynamic array class with corresponding methods to alter the array
-//  project0
-//
-//  Created by Chance Tudor on 9/3/18.
-//  Copyright © 2018 Chance Tudor. All rights reserved.
-//
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdbool.h>
-#include <string.h>
 #include "cda.h"
-
-typedef void (*FM)(void * ptr); // typedef declaration to store a freeMethod function pointer in CDA struct
-typedef void (*DM)(void * ptr, FILE *fp); // typedef declaration to store a displayMethod function pointer in CDA struct
-static int getCapacityCDA(CDA * items);
-static void setCapacityCDA(CDA * items, int cap);
-static int correctIndex(CDA *items, int oldIndex);
-static int getStartCDA(CDA * items);
-static int getEndCDA(CDA * items);
-static int getIndex(CDA * items, int oldIndex);
-static bool isFull(CDA * items);
-static void doubleArray(CDA * items);
-static void halveArray(CDA * items);
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 
 struct cda {
-  void * (*storage);
-  int capacity;
-  int size;
-  int startIndex;
-  int endIndex;
-  int debugVal;
-  FM freeMethod;
-  DM displayMethod;
+    int curSize;
+    int capacity;
+    int start;
+    int end;
+    int debug;
+    void **array;
+    void(*display)(void *v, FILE *fp);
+    void(*free)(void *v);
 };
 
-// constructor; returns new, initialized CDA object
-extern CDA * newCDA(void) {
-  CDA * array = malloc(sizeof(CDA));
-  assert(array != 0);
-  array->capacity = 1;
-  array->storage = malloc(sizeof(void *) * array->capacity);
-  assert(array->storage != 0);
-  array->size = 0;
-  array->startIndex = 0;
-  array->endIndex = 0;
-  array->debugVal = 0;
-  array->freeMethod = 0;
-  array->displayMethod = 0;
-
-  return array;
+CDA *newCDA(void) {
+    CDA *items = malloc(sizeof(CDA));
+    assert(items != 0);
+    items->array = malloc(sizeof(void *));
+    items->curSize = 0;
+    items->capacity = 1;
+    items->start = 0;
+    items->end = 0;
+    items->display = 0;
+    items->free = 0;
+    items->debug = 0;
+    return items;
 }
 
-extern void setCDAdisplay(CDA *items, void (*displayMeth)(void *ptr, FILE *fp)) { items->displayMethod = displayMeth; }
-
-extern void setCDAfree(CDA *items, void (*freeMeth)(void *ptr)) { items->freeMethod = freeMeth; }
-
-static bool isFull(CDA * items) {
-  if (sizeCDA(items) == getCapacityCDA(items)) { return true; }
-  else { return false; }
+void setCDAdisplay(CDA *items, void(*d)(void *, FILE *)) {
+    items->display = d;
+    return;
 }
 
-static void doubleArray(CDA * items) {
-  int newCap = getCapacityCDA(items) * 2;
-  void * (*temp) = malloc(sizeof(void *) * newCap);
-  assert(temp != 0);
-  for (int i = 0; i < sizeCDA(items); i++) { temp[i] = getCDA(items, i); }
-  free(items->storage);
-  items->storage = temp;
-  items->startIndex = 0;
-  items->endIndex = sizeCDA(items);
-  setCapacityCDA(items, newCap);
+void setCDAfree(CDA *items, void(*f)(void *)) {
+    items->free = f;
+    return;
 }
 
-static void halveArray(CDA * items) {
-  int newCap = 0;
-  if (getCapacityCDA(items) != 1) {
-    newCap = getCapacityCDA(items) / 2;
-  }
-  else { newCap = getCapacityCDA(items); }
-  //int newCap = getCapacityCDA(items) / 2;
-  void * (*temp) = malloc(sizeof(void*) * newCap);
-  assert(temp != 0);
-  for (int i = 0; i < sizeCDA(items); i++) { temp[i] = getCDA(items, i); }
-  free(items->storage);
-  items->storage = temp;
-  items->startIndex = 0;
-  items->endIndex = sizeCDA(items);
-  setCapacityCDA(items, newCap);
+int translate(CDA *items, int i) {
+    return (items->start + items->capacity + i) % items->capacity;
 }
 
-static int correctIndex(CDA *items, int oldIndex) {
-  int index = (oldIndex + getCapacityCDA(items) + getStartCDA(items)) % getCapacityCDA(items);
-  return index;
+void customRealloc(CDA *items, int newSize) {
+    void **temp = items->array;
+    items->array = malloc(sizeof(void *) * newSize);
+    assert(items->array != 0);
+    for (int i = 0; i < items->curSize; ++i)
+        items->array[i] = temp[translate(items, i)];// [(items->start + i) % items->capacity];
+    items->start = 0;
+    items->end = items->curSize;
+    free(temp);
+    return;
 }
 
-// places value in slot named by given index
-// previous item at that slot shifts to the next higher slot (and so on)
-// if no room for insertion, array grows by doubling
-extern void insertCDA(CDA *items, int index, void *value) {
-  assert(index >= 0 && index <= sizeCDA(items));
-  // if full, then double
-  if (isFull(items) == true) { doubleArray(items); }
-
-  if (index == 0) { // insert at front of CDA
-    if (sizeCDA(items) != 0) { items->startIndex = correctIndex(items, -1); }
-
-    if (sizeCDA(items) == 0) { items->endIndex = 1; }
-
-    items->storage[getStartCDA(items)] = value;
-    items->size += 1;
-  }
-
-  else if (index == sizeCDA(items)) { // insert at back of CDA
-    items->storage[getEndCDA(items)] = value;
-    items->endIndex = correctIndex(items, sizeCDA(items) + 1);
-    items->size += 1;
-  }
-
-  else { // insert in the middle of the CDA
-    int decisionPt = sizeCDA(items) / 2; // determines whether array shifts left or right for insertion
-    int trueIndex = correctIndex(items, index);
-    if (index <= decisionPt) { // shift left
-      for (int i = 0; i < index; i++) {
-        items->storage[correctIndex(items, i - 1)] = items->storage[correctIndex(items, i)];
-      }
-      items->storage[correctIndex(items, index - 1)] = value;
-  	  items->startIndex = (items->startIndex + items->capacity - 1) % items->capacity;
+void insertCDA(CDA *items, int index, void *value) {
+    assert(items->array != 0);
+    assert(index >= 0 && index <= items->curSize);
+    if (items->curSize >= items->capacity || items->capacity == 1) { //dynamic allocation
+        customRealloc(items, (items->capacity * 2));
+        items->capacity *= 2;
     }
-    else { // shift right
-      for (int i = items->size - 1; i >= index; i--) {
-        items->storage[correctIndex(items, i + 1)] = items->storage[correctIndex(items, i)];
-      }
-      items->storage[trueIndex] = value;
-      items->endIndex = (items->endIndex + 1) % items->capacity;
+    if (items->curSize == 0) { //first element
+        items->array[0] = value;
+        items->start = 0;
+        items->end = 1;
     }
-    items->size += 1;
-  }
+    else if (index == 0) { //insertFront
+        items->start = ((items->start - 1) + items->capacity) % items->capacity;
+        items->array[items->start] = value;
+    }
+    else if (index == items->curSize) { //insertBack
+        items->array[items->end] = value;
+        items->end = (items->end + 1) % items->capacity;
+    }
+    else if (index > 0 && index < items->curSize) { //insertMiddle
+        if (index > items->curSize / 2) { //shift right
+            for (int i = items->curSize - 1; i >= index; --i)
+                items->array[translate(items, i + 1)] = items->array[translate(items, i)];
+            setCDA(items, index, value);
+            items->end = (items->end + 1) % items->capacity;
+        }
+        else { //shift left
+            for (int i = 0; i < index; ++i)
+                items->array[translate(items, i - 1)] = items->array[translate(items, i)];
+            setCDA(items, index - 1, value);
+            items->start = (items->start + items->capacity - 1) % items->capacity;
+        }
+    }
+    items->curSize++;
+    return;
 }
 
-// removes and returns the item named by the given index
-// item at the next higher slot shifts to that slot (and so on)
-// if ratio of size to capacity < .25 array shrinks by half
-// array should never shrink below a capacity of one
-extern void *removeCDA(CDA * items, int index) {
-  assert(index >= 0 && index <= sizeCDA(items) - 1);
-  assert(sizeCDA(items) > 0);
-  void * value = getCDA(items, index);
-
-  if (index == 0) {
-    items->startIndex = correctIndex(items, 1);
-    items->size -= 1;
-  }
-  else if (index == sizeCDA(items) - 1) {
-    items->endIndex = (items->endIndex - 1 + items->capacity) % items->capacity;
-    items->size -= 1;
-  }
-  else {
-    int decisionPt = sizeCDA(items) / 2; // determines whether array shifts left or right for removal
-    if (index <= decisionPt) { // shift right
-      for (int i = index; i > 0; i--) {
-        items->storage[correctIndex(items, i)] = items->storage[correctIndex(items, i - 1)];
-      }
-      items->startIndex = (items->startIndex + 1) % items->capacity;
+void *removeCDA(CDA *items, int index) {
+    assert(items->curSize != 0);
+    assert(index >= 0 && index <= (items->curSize - 1));
+    //int newI = (items->start + index) % items->capacity;
+    void *removed = getCDA(items, index);// items->array[newI];
+    if (items->curSize == 1)
+        items->start = items->end = 0;
+    else if (index == 0) //removeFront WRONG PERSPECTIVE, CHANGED TO 0
+        items->start = (items->start + 1) % items->capacity;
+    else if (index == items->curSize - 1) //removeBack
+        items->end = ((items->end - 1) + items->capacity) % items->capacity;
+    else if (index > 0 && index < items->curSize - 1) { //removeMiddle
+        if (index > items->curSize / 2) { //shift from the right
+            for (int i = index; i < items->curSize - 1; ++i)
+                items->array[translate(items, i)] = items->array[translate(items, i + 1)];
+            items->end = ((items->end - 1) + items->capacity) % items->capacity;
+        }
+        else { //shift form the left
+            for (int i = index; i > 0; --i)
+                items->array[translate(items, i)] = items->array[translate(items, i - 1)];
+            items->start = (items->start + 1) % items->capacity;
+        }
     }
-
-    else { // shift left
-      for (int i = index; i < sizeCDA(items) - 1; i++) {
-        items->storage[correctIndex(items, i)] = items->storage[correctIndex(items, i + 1)];
-      }
-      items->endIndex = (items->endIndex - 1 + items->capacity) % items->capacity;
+    items->curSize--;
+    if (items->curSize == 0) { //added this if statement
+        customRealloc(items, 1);
+        items->capacity = 1;
     }
-
-    items->size -= 1;
-  }
-
-  if ((sizeCDA(items)/(double)getCapacityCDA(items)) < .25) {
-    halveArray(items);
-    if ((sizeCDA(items)/(double)getCapacityCDA(items)) < .25) {
-      halveArray(items);
+    if ((items->curSize) * 4 < items->capacity && items->capacity != 1) {
+        customRealloc(items, items->capacity / 2); //changed order of this line and the one below
+        items->capacity /= 2;
     }
-  }
-
-  return value;
+    return removed;
 }
 
-static int getStartCDA(CDA * items) { return items->startIndex; }
-
-static int getEndCDA(CDA * items) { return items->endIndex; }
-
-static int getIndex(CDA * items, int oldIndex) {
-  int trueIndex = correctIndex(items, oldIndex);
-  return trueIndex;
+void unionCDA(CDA *recipient, CDA *donor) {
+    //customRealloc(donor, donor->curSize);
+    //void **temp = donor->array;
+    int j = donor->curSize;
+    for (int i = 0; i < j; ++i)
+        insertCDAback(recipient, getCDA(donor, i));
+    free(donor->array);
+    donor->array = malloc(sizeof(void *));
+    donor->curSize = 0;
+    donor->capacity = 1;
+    return;
 }
 
-// takes two arrays and moves all the items in the donor array to the recipient arrays
-extern void unionCDA(CDA *recipient, CDA *donor) {
-  for (int i = 0; i < sizeCDA(donor); i++) {
-    insertCDAback(recipient, getCDA(donor, i));
-  }
-  donor->size = 0;
-  donor->capacity = 1;
-  free(donor->storage);
-  donor->storage = malloc(sizeof(void *) * 1);
+void *getCDA(CDA *items, int index) {
+    assert(index >= 0 && index < items->capacity);
+    return items->array[(items->start + index + items->capacity) % items->capacity];
 }
 
-// method returns the value at the given index, from user's perspective
-// In the user's view, the first item is at index zero, the second item at index 1, and so on
-// routine has to translate between the users view
-// and the internal view (where the first item can be anywhere in the underlying array)
-extern void *getCDA(CDA *items, int index) {
-  assert(index >= 0 && index < sizeCDA(items));
-  int trueIndex = correctIndex(items, index);
-  return items->storage[trueIndex];
-}
-
-// updates the value at the given index, from user's perspective
-// if given index == size of the array, value is inserted at back of array
-// if given index == -1 value is inserted at front of array
-extern void *setCDA(CDA *items, int index, void *value) {
-  assert(index >= -1 && index <= sizeCDA(items));
-  int trueIndex = correctIndex(items, index);
-  if (index == sizeCDA(items)) {
-    insertCDAback(items, value);
-    return 0; /*val;*/
-  }
-  else if (index == -1) {
-    insertCDAfront(items, value);
-    return 0; /*val;*/
-  }
-  else {
-    void * val = getCDA(items, trueIndex);
-    items->storage[trueIndex] = value;
-    return val;
-  }
-}
-
-// method returns the size of array
-extern int sizeCDA(CDA *items) { return items->size; }
-
-// method returns the capacity of array
-static int getCapacityCDA(CDA * items) { return items->capacity; }
-
-static void setCapacityCDA(CDA * items, int c) { items->capacity = c; }
-
-extern void displayCDA(CDA *items, FILE *fp) {
-  if (sizeCDA(items) == 0) {
-    if (items->debugVal > 0) { fprintf(fp, "((%d))", items->capacity); } // empty array and method should display num. empty indeces
-    else { fprintf(fp, "()"); } // empty array and method should not display num. empty indeces
-  }
-
-  else if (items->displayMethod == 0) {
-    if (items->debugVal > 0) { // no display method set and method should display num. empty indeces
-      fprintf(fp, "(");
-      for (int i = 0; i < sizeCDA(items); i++) {
-        fprintf(fp, "@%p,", &items->storage[getIndex(items, i)]); // no set display method forces addresses of each item to be printed
-      }
-      fprintf(fp, "(%d))", (getCapacityCDA(items) - sizeCDA(items)));
+void *setCDA(CDA *items, int index, void *value) {
+    assert(index >= -1 && index <= items->capacity);
+    void *replaced = 0;
+    if (index == -1) insertCDAfront(items, value);
+    else if (index == items->capacity) insertCDAback(items, value);
+    else {
+        replaced = items->array[(items->start + index) % items->capacity];
+        items->array[(items->start + index + items->capacity) % items->capacity] = value;
     }
-    else { // no display method set and method should not display num. empty indeces
-      fprintf(fp, "(");
-      for (int i = 0; i < sizeCDA(items); i++) {
-        fprintf(fp, "@%p,", &items->storage[getIndex(items, i)]); // no set display method forces addresses of each item to be printed
-      }
-      fprintf(fp, ")");
-    }
-  }
-  else {
-    if (items->debugVal > 0) { // display method set and method should display num. empty indeces
-      fprintf(fp, "(");
-      for (int i = 0; i < sizeCDA(items); i++) {
-        items->displayMethod(getCDA(items, i), fp);
-        if (i != (sizeCDA(items))) { fprintf(fp, ","); }
-      }
-      fprintf(fp, "(%d))", (getCapacityCDA(items) - sizeCDA(items)));
-    }
-    else { // display method set and method should not display num. empty indeces
-      fprintf(fp, "(");
-      for (int i = 0; i < sizeCDA(items); i++) {
-        items->displayMethod(getCDA(items, i), fp);
-        if (i != (sizeCDA(items) - 1)) { fprintf(fp, ","); }
-      }
-      fprintf(fp, ")");
-    }
-  }
+    return replaced;
 }
 
-extern int debugCDA(CDA *items, int level) {
-  int prevVal = items->debugVal;
-  items->debugVal = level;
-
-  return prevVal;
+void **extractCDA(CDA *items) {
+    customRealloc(items, items->curSize);
+    void **returned = items->array;
+    items->array = malloc(sizeof(void *));
+    items->curSize = 0;
+    items->capacity = 1;
+    return returned;
 }
 
-extern void freeCDA(CDA *items) {
-  if (items->freeMethod != 0) { // individual items are only freed if a freeMethod is set
-    for (int i = 0; i < sizeCDA(items); i++) { items->freeMethod(getCDA(items, i)); }
-  }
-  free(items->storage);
-  free(items);
+int sizeCDA(CDA *items) {
+    return items->curSize;
+}
+
+void displayCDA(CDA *items, FILE *fp) {
+    fprintf(fp, "(");
+    for (int i = 0; i < items->curSize; ++i) {
+        items->display ?
+            items->display(items->array[(items->start + i) % items->capacity], fp):
+            fprintf(fp, "@%p", items->array[(items->start + i) % items->capacity]);
+        if (i != items->curSize - 1)
+            fprintf(fp, ",");
+    }
+    if (items->debug)
+        items->curSize ?
+        fprintf(fp, ",(%d)", items->capacity - items->curSize) :
+        fprintf(fp, "(%d)", items->capacity - items->curSize);
+    fprintf(fp, ")");
+    return;
+}
+
+int debugCDA(CDA *items, int level) {
+    int previous = items->debug;
+    items->debug = level;
+    return previous;
+}
+
+void freeCDA(CDA *items) {
+    if (items->free)
+        for (int i = 0; i < items->curSize; ++i)
+            items->free(items->array[(items->start + i) % items->capacity]);
+    free(items->array);
+    free(items);
+    return;
 }

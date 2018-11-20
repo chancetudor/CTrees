@@ -1,9 +1,20 @@
+/*File: gst.c
+ *Author: Chance Tudor
+ *Implements functions found in gst.h in order to implement a green tree
+ */
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "gst.h"
 #include "bst.h"
 #include "tnode.h"
+// stores a comparator function pointer in GST struct
+typedef int (*CM)(void * one, void * two);
+// stores a displayMethod function pointer in GST struct
+typedef void (*DM)(void * ptr, FILE *fp);
+// stores a swapper function pointer in GST struct
+typedef void (*SM)(TNODE * one, TNODE * two);
+// stores a freeMethod function pointer in GST struct
+typedef void (*FM)(void * ptr);
 
 typedef struct gstval GSTVAL;
 
@@ -22,7 +33,6 @@ struct gstval {
   DM display;
   CM compare;
   FM freeMethod;
-  //SM swap;
 };
 
 static TNODE * findGSTNode(GST *t, void *key);
@@ -51,11 +61,10 @@ extern GST * newGST(int (*c)(void * one, void * two)) {
 static GSTVAL * newGSTVAL(GST *t, void *v) {
   GSTVAL * value = malloc(sizeof(GSTVAL));
   value->val = v;
-  value->freq = 0;
+  value->freq = 1;
   value->display = t->display;
   value->compare = t->compare;
   value->freeMethod = t->freeMethod;
-  //value->swap = t->swap;
 
   return value;
 }
@@ -85,8 +94,9 @@ extern TNODE *getGSTroot(GST *t) {
 // sets root of GST
 extern void setGSTroot(GST *t, TNODE *replacement) {
   BST * tree = t->tree;
-  setBSTroot(tree, replacement);
   setTNODEparent(replacement, replacement);
+  setBSTroot(tree, replacement);
+  //setTNODEparent(replacement, replacement);
 }
 // sets size of GST
 extern void setGSTsize(GST *t, int s) {
@@ -104,14 +114,9 @@ extern TNODE *insertGST(GST *t, void *value) {
     GSTVAL * ptr = (GSTVAL *)getTNODEvalue(temp);
     setGSTFreq(ptr, ptr->freq + 1);
     setGSTduplicates(t, getGSTduplicates(t) + 1);
-    if (t->freeMethod != 0) {
-      t->freeMethod(value);
-    }
-    free(newVal);
+    freeGVAL(newVal);
     return 0;
   }
-  //setGSTduplicates(t, getGSTduplicates(t) + 1);
-  setGSTFreq(newVal, newVal->freq + 1);
   BST * tree = t->tree;
   return insertBST(tree, newVal);
 }
@@ -127,13 +132,15 @@ extern void * findGST(GST *t, void *key) {
   void * val = unwrapGST(temp);
   free(v);
   return val;
-  //return unwrapGST(temp);
 }
 // returns the tree node holding the searched-for key.
 // If the key is not in the tree, the method returns null.
 extern TNODE *locateGST(GST *t, void *key) {
+  GSTVAL * v = newGSTVAL(t, key);
   BST * tree = t->tree;
-  return locateBST(tree, key);
+  TNODE * ptr = locateBST(tree, v);
+  free(v);
+  return ptr;
 }
 /*
 * finds the generic value stored in the tree that matches the given value.
@@ -158,9 +165,10 @@ extern int deleteGST(GST *t, void *key) {
     free(newVal);
     return freq;
   }
-  GSTVAL * v = newGSTVAL(t, key); // FIXME: Free
-  //setGSTduplicates(t, getGSTduplicates(t) - 1);
-  return deleteBST(tree, v);
+  GSTVAL * v = newGSTVAL(t, key);
+  int finalFreq = deleteBST(tree, v);
+  free(v);
+  return finalFreq;
 }
 /* recursively swaps a node's value with its predecessor's (preferred)
 * or its successor's until a leaf node holds the original value.
@@ -178,6 +186,7 @@ extern TNODE *swapToLeafGST(GST *t, TNODE *node) {
 extern void pruneLeafGST(GST *t, TNODE *leaf) {
   BST * tree = t->tree;
   pruneLeafBST(tree, leaf);
+  free(getTNODEvalue(leaf));
 }
 // returns number of nodes currently in tree
 extern int sizeGST(GST *t) {

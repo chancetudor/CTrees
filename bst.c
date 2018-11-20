@@ -10,6 +10,15 @@
 #include "bst.h"
 #include "tnode.h"
 
+// stores a comparator function pointer in BST struct
+typedef int (*CM)(void * one, void * two);
+// stores a displayMethod function pointer in BST struct
+typedef void (*DM)(void * ptr, FILE *fp);
+// stores a swapper function pointer in BST struct
+typedef void (*SM)(TNODE * one, TNODE * two);
+// stores a freeMethod function pointer in BST struct
+typedef void (*FM)(void * ptr);
+
 struct bst {
   TNODE * root;
   int size;
@@ -146,7 +155,8 @@ extern int deleteBST(BST *t, void *key) {
   if (temp) {
     temp = swapToLeafBST(t, temp); // temp now a leaf
     pruneLeafBST(t, temp); // prune leaf
-    free(temp);
+    //free(temp);
+    t->freeMethod(temp);
     setBSTsize(t, sizeBST(t) - 1); // decrement size
     return 0;
   }
@@ -275,12 +285,10 @@ extern void freeBST(BST *t) {
   TNODE * temp = getBSTroot(t);
   if (temp == 0 || sizeBST(t) == 0) {
     free(t);
-    //setBSTroot(t, 0);
     return;
   }
   freeSubTree(temp);
   free(t);
-  //setBSTroot(t, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 static int getDebugVal(BST *t) {
@@ -562,7 +570,10 @@ static void displayPostOrder(BST *t, TNODE *n, FILE *fp) {
 
   t->displayMethod(getTNODEvalue(n), fp); // curr node
 
-  fprintf(fp, "] "); // outer bracket
+  fprintf(fp, "]"); // outer bracket
+  if (n != getBSTroot(t)) {
+    fprintf(fp, " ");
+  }
 }
 
 static int min(int x, int y) {

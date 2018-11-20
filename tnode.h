@@ -2,10 +2,7 @@
 #define __TNODE_INCLUDED__
 
 #include <stdio.h>
-// stores a freeMethod function pointer in TNODE struct
-typedef void (*FM)(void * ptr);
-// stores a displayMethod function pointer in TNODE struct
-typedef void (*DM)(void * ptr, FILE *fp);
+
 typedef struct tnode TNODE;
 
 extern TNODE *newTNODE(void *v, TNODE *l, TNODE *r, TNODE *p);

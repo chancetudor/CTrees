@@ -7,14 +7,6 @@
 #include "tnode.h"
 #include "bst.h"
 
-// stores a comparator function pointer in GST struct
-typedef int (*CM)(void * one, void * two);
-// stores a displayMethod function pointer in GST struct
-typedef void (*DM)(void * ptr, FILE *fp);
-// stores a swapper function pointer in GST struct
-typedef void (*SM)(TNODE * one, TNODE * two);
-// stores a freeMethod function pointer in GST struct
-typedef void (*FM)(void * ptr);
 typedef struct gst GST;
 
 extern GST   *newGST(int (*c)(void *,void *));
