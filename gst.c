@@ -96,7 +96,6 @@ extern void setGSTroot(GST *t, TNODE *replacement) {
   BST * tree = t->tree;
   setTNODEparent(replacement, replacement);
   setBSTroot(tree, replacement);
-  //setTNODEparent(replacement, replacement);
 }
 // sets size of GST
 extern void setGSTsize(GST *t, int s) {
@@ -111,10 +110,10 @@ extern TNODE *insertGST(GST *t, void *value) {
   GSTVAL * newVal = newGSTVAL(t, value); // FIXME: Free
   TNODE * temp = findGSTNode(t, newVal);
   if (temp) {
+    freeGVAL(newVal);
     GSTVAL * ptr = (GSTVAL *)getTNODEvalue(temp);
     setGSTFreq(ptr, ptr->freq + 1);
     setGSTduplicates(t, getGSTduplicates(t) + 1);
-    freeGVAL(newVal);
     return 0;
   }
   BST * tree = t->tree;
@@ -123,7 +122,7 @@ extern TNODE *insertGST(GST *t, void *value) {
 // returns the value stored with the given key
 // returns null if the key is not in the tree.
 extern void * findGST(GST *t, void *key) {
-  GSTVAL * v = newGSTVAL(t, key); // FIXME: Free
+  GSTVAL * v = newGSTVAL(t, key);
   TNODE * temp = findGSTNode(t, v);
   if (temp == 0) {
     free(v);
@@ -156,7 +155,7 @@ extern int deleteGST(GST *t, void *key) {
     return -1;
   }
   else if (freq > 1) { // multiple GSTVALs w/ same value in tree
-    GSTVAL * newVal = newGSTVAL(t, key); // FIXME: Free
+    GSTVAL * newVal = newGSTVAL(t, key);
     TNODE * node = findGSTNode(t, newVal);
     GSTVAL * ptr = (GSTVAL *)getTNODEvalue(node);
     --freq;
@@ -165,10 +164,10 @@ extern int deleteGST(GST *t, void *key) {
     free(newVal);
     return freq;
   }
-  GSTVAL * v = newGSTVAL(t, key);
-  int finalFreq = deleteBST(tree, v);
+  GSTVAL * v = getTNODEvalue(locateGST(t, key));
+  int result = deleteBST(tree, v);
   free(v);
-  return finalFreq;
+  return result;
 }
 /* recursively swaps a node's value with its predecessor's (preferred)
 * or its successor's until a leaf node holds the original value.

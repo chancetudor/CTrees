@@ -98,7 +98,7 @@ extern void setRBTdisplay(RBT *t, void (*d)(void * ptr, FILE * fp)) {
 extern void setRBTswapper(RBT *t, void (*s)(TNODE *x, TNODE *y)) {
   t->swap = s;
   GST * tree = t->tree;
-  setGSTswapper(tree, s);
+  setGSTswapper(tree, (void *)swapRBTVals);
 }
 
 extern void setRBTfree(RBT *t, void (*f)(void * ptr)) {
@@ -116,7 +116,6 @@ extern void setRBTroot(RBT *t, TNODE *replacement) {
   GST * tree = t->tree;
   setTNODEparent(replacement, replacement);
   setGSTroot(tree, replacement);
-  //setTNODEparent(replacement, replacement);
 }
 
 extern void setRBTsize(RBT *t, int s) {
@@ -138,12 +137,12 @@ extern void * findRBT(RBT *t, void *value) {
   RBTVAL * newVal = newRBTVAL(t, value);
   TNODE * n = findRBTNode(t, newVal);
   if (n == 0) {
+    free(newVal);
     return 0;
   }
   void * val = unwrapRBT(n);
   free(newVal);
   return val;
-  //return unwrapRBT(n);
 }
 
 extern TNODE *locateRBT(RBT *t, void *key) {
@@ -159,7 +158,9 @@ extern int deleteRBT(RBT *t, void *key) {
   }
   else if (freq > 1) {
     RBTVAL * v = newRBTVAL(t, key);
-    return deleteGST(tree, v);
+    int result = deleteGST(tree, v);
+    free(v);
+    return result;
   }
 
   RBTVAL * newVal = newRBTVAL(t, key);

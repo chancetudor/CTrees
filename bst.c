@@ -1,8 +1,7 @@
 /*File: bst.c
  *Author: Chance Tudor
  *Implements functions found in bst.h in order to implement a binary search tree
- */
-
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -155,8 +154,8 @@ extern int deleteBST(BST *t, void *key) {
   if (temp) {
     temp = swapToLeafBST(t, temp); // temp now a leaf
     pruneLeafBST(t, temp); // prune leaf
-    //free(temp);
-    t->freeMethod(temp);
+    free(temp);
+    //t->freeMethod(temp);
     setBSTsize(t, sizeBST(t) - 1); // decrement size
     return 0;
   }

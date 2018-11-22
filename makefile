@@ -61,13 +61,13 @@ test : rbt gst bst #trees cda queue
 	#./queue
 	#./bst
 	./gst
-	./rbt
+	#./rbt
 valgrind : bst gst rbt #trees cda queue
 	#valgrind --leak-check=full ./da
 	#valgrind --leak-check=full ./cda
 	#valgrind --leak-check=full ./stack
 	#valgrind --leak-check=full ./queue
-	valgrind --tool=memcheck --leak-check=yes bst
+	valgrind --tool=memcheck --leak-check=full bst
 	valgrind --tool=memcheck --leak-check=yes gst
 	valgrind --tool=memcheck --leak-check=yes rbt
 clean :
