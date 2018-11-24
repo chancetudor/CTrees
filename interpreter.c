@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "rbt.h"
 #include "gst.h"
 #include "scanner.h"
+#include "string.h"
 
 RBT *readRBTCorpus(RBT *tree, char *filename);
 void readRBTCommands(RBT *tree, char *filename, FILE *outfp);
-GST *readGSTCorpus(GST *tree, char *filename);
+GST *readGSTCorpus(GST *tree, char * filename);
 void readGSTCommands(GST *tree, char *filename, FILE *outfp);
 
 void RBTInterpreter(RBT *tree, char **argv, FILE *outfp) {
@@ -76,19 +78,23 @@ void GSTInterpreter(GST *tree, char **argv, FILE *outfp) {
   readGSTCommands(tree, argv[3], outfp);
 }
 
-GST *readGSTCorpus(GST *tree, char *filename) {
+GST *readGSTCorpus(GST *tree, char * filename) {
   char *str;
+  //char c;
   FILE *fp = fopen(filename, "r");
   if (fp == 0) {
-    fprintf(stdout, "Error: %s could not be opened for reading.\n", filename);
+    printf("Error: %d (%s)\n", errno, strerror(errno));
+    exit(0);
   }
-  str = readString(fp);
-  while (!feof(fp)) {
-    if (strlen(str) > 0) {
-      insertGST(tree, str);
+
+  str = readToken(fp);
+  //c = readChar(fp);
+    while (!feof(fp)) {
+      if (strlen(str) > 0) {
+        insertGST(tree, str);
+      }
+    str = readToken(fp);
     }
-    str = readString(fp);
-  }
   fclose(fp);
 
   return tree;
@@ -96,14 +102,16 @@ GST *readGSTCorpus(GST *tree, char *filename) {
 
 void readGSTCommands(GST *tree, char *filename, FILE *outfp) {
   char *str;
+  char inChar;
   int freq;
   FILE *fp = fopen(filename, "r");
   if (fp == 0) {
-    fprintf(stdout, "Error: %s could not be opened for reading.\n", filename);
+    printf("Error: %d (%s)\n", errno, strerror(errno));
+    exit(0);
   }
-  int c = fgetc(fp);
+  int switchChar = fgetc(fp);
   while (!feof(fp)) {
-    switch (c) {
+    switch (switchChar) {
       case 's':
         displayGST(tree, outfp);
         break;
@@ -120,13 +128,20 @@ void readGSTCommands(GST *tree, char *filename, FILE *outfp) {
         deleteGST(tree, str);
         break;
       case 'i':
-        str = readString(fp);
+        inChar = readChar(fp);
+        fprintf(outfp, "%c\n", inChar);
+        if (inChar != '\"') {
+            str = readToken(fp);
+        }
+        else {
+            str = readString(fp);
+        }
         if (strlen(str) > 0) {
           insertGST(tree, str);
         }
         break;
       }
-    c = fgetc(fp);
+    switchChar = fgetc(fp);
   }
   fclose(fp);
 }

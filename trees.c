@@ -34,12 +34,12 @@ int main(int argc, char **argv) {
   if (green) {
     GST * tree = newGST(compareSTRING);
     GSTInterpreter(tree, argv, stdout);
-    freeGST(tree);
+    //freeGST(tree);
   }
   else if (rbt == 1 || (rbt == 0 && green == 0)) {
     RBT * tree = newRBT(compareSTRING);
     RBTInterpreter(tree, argv, stdout);
-    freeRBT(tree);
+    //freeRBT(tree);
   }
   else {
     printf("Error: invalid flag. Valid flags are: '-v' | '-g' | '-r'\n");

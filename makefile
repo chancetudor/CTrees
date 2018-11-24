@@ -55,13 +55,14 @@ gst-0-4.o : gst-0-4.c integer.h string.h queue.h bst.h real.h
 	gcc $(OOPTS) gst-0-4.c
 rbt-0-10.o : rbt-0-10.c gst.h rbt.h integer.h real.h string.h
 	gcc $(OOPTS) rbt-0-10.c
-test : rbt gst bst #trees cda queue
+test : rbt gst bst trees #cda queue
 	#./cda
 	#./stack
 	#./queue
 	#./bst
-	./gst
+	#./gst
 	#./rbt
+	./trees -g t-0-0-corpus.txt t-0-0-commands.txt
 valgrind : bst gst rbt #trees cda queue
 	#valgrind --leak-check=full ./da
 	#valgrind --leak-check=full ./cda

@@ -146,8 +146,11 @@ extern void * findRBT(RBT *t, void *value) {
 }
 
 extern TNODE *locateRBT(RBT *t, void *key) {
+  RBTVAL * v = newRBTVAL(t, key);
   GST * tree = t->tree;
-  return locateGST(tree, key);
+  TNODE * ptr = locateGST(tree, key);
+  free(v);
+  return ptr;
 }
 
 extern int deleteRBT(RBT *t, void *key) {
@@ -162,7 +165,6 @@ extern int deleteRBT(RBT *t, void *key) {
     free(v);
     return result;
   }
-
   RBTVAL * newVal = newRBTVAL(t, key);
   TNODE * node = findRBTNode(t, newVal);
   node = swapToLeafRBT(t, node);

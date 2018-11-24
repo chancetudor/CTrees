@@ -1,0 +1,77 @@
+Value hp not found.
+0: ncy(ncy)X
+1: dg*(ncy)L uod(ncy)R
+2: bi(dg*)L hpr(dg*)R q*<3>(uod)L we*(uod)R
+3: aqz(bi)L dd(bi)R g f(hpr)L kj*(hpr)R o<2>(q*<3>)L siw(q*<3>)R v(we*)L xqi(we*)R
+4: a<3>(aqz)L az(aqz)R c*<3>(dd)L =de(dd)R ecl*(g f)L h<2>(g f)R jh(kj*)L m<2>(kj*)R nw*(o<2>)L og(o<2>)R r<2>(siw)L t i*(siw)R uu(v)L =vz(v)R x<3>(xqi)L yx*(xqi)R
+5: =ae*(a<3>)R =arj*(az)L bvw(c*<3>)L d(c*<3>)R du(ecl*)L fn(ecl*)R =gvu*(h<2>)L =hh*(h<2>)R ix*(jh)L k<2>(jh)R lk<2>(m<2>)L mw(m<2>)R =nj(nw*)L ny(nw*)R =oa*(og)L =ou*(og)R =qq*(r<2>)L =s*(r<2>)R =t(t i*)L u(t i*)R =uza*(uu)R =wv*(x<3>)L =xp*(x<3>)R ys(yx*)L =z<3>(yx*)R
+6: =bl*(bvw)L =bwj*(bvw)R =cx*(d)L =dcr*(d)R =dz*(du)R =eu*(fn)L =g*<2>(fn)R ie(ix*)L =j(ix*)R =ki*(k<2>)R =kq*(lk<2>)L =lo*(lk<2>)R =mo*(mw)L =n*(mw)R =nz*(ny)R =ug*(u)R =yq*(ys)L =yw*(ys)R
+7: =i*<2>(ie)L =iiy*(ie)R
+Duplicates: 18
+Nodes: 76
+Minimum depth: 4
+Maximum depth: 7
+Value qi not found.
+Value lj not found.
+Value ts not found.
+Value ap not found.
+Value to not found.
+Value wi not found.
+Value pf not found.
+Value e not found.
+Value g r not found.
+Value sy not found.
+Value jd not found.
+Value bd not found.
+Value dk not found.
+Value vrr not found.
+Value m f not found.
+Value tnp not found.
+Value ma not found.
+Value mat not found.
+0: ncy(ncy)X
+1: dg*<2>(ncy)L uod*(ncy)R
+2: bi(dg*<2>)L hpr(dg*<2>)R q<2>(uod*)L we(uod*)R
+3: aqz(bi)L dd(bi)R g f(hpr)L kj*(hpr)R o<2>(q<2>)L siw*(q<2>)R uza(we)L xqi(we)R
+4: a<2>(aqz)L az(aqz)R c*<4>(dd)L =de(dd)R ecl*(g f)L h*(g f)R ix(kj*)L m(kj*)R nw*(o<2>)L og*(o<2>)R r<3>(siw*)L t i(siw*)R =uu(uza)L vz(uza)R x<3>(xqi)L yx*(xqi)R
+5: =ae*(a<2>)R =arj*(az)L bvw(c*<4>)L cx(c*<4>)R du(ecl*)L fn(ecl*)R gvu(h*)L hh(h*)R ie*(ix)L jh*(ix)R lk<2>(m)L mw(m)R =nj(nw*)L ny(nw*)R oa(og*)L =ou(og*)R qq*(r<3>)L s<2>(r<3>)R =t(t i)L u(t i)R =v*(vz)L =wv*(x<3>)L =xp*(x<3>)R ys(yx*)L =z<2>(yx*)R
+6: =bl*(bvw)L =bwj*(bvw)R =cd*(cx)L =dcr*(cx)R =dq*(du)L =dz*(du)R =eu*(fn)L =g*(fn)R =gj*(gvu)L =hf*(hh)L =i<2>(ie*)L iiy(ie*)R =j(jh*)L k(jh*)R =kq*(lk<2>)L =lo*(lk<2>)R =mo*(mw)L =n*(mw)R =nz*(ny)R =oc*(oa)R =qon(qq*)L qw<2>(qq*)R =rx*(s<2>)L =tsc*(u)L =ug*<2>(u)R =yq*(ys)L =yw*(ys)R
+7: =irv*(iiy)R =ki*(k)R =qv*(qw<2>)L
+Duplicates: 17
+Nodes: 86
+Minimum depth: 4
+Maximum depth: 7
+Value f not found.
+Value zdc not found.
+Value kgw not found.
+Value awy not found.
+Value wja not found.
+Value w not found.
+Value js not found.
+Value kxw not found.
+Value p not found.
+Value xhy not found.
+Value skt not found.
+Value vw not found.
+Value vt not found.
+Value bz not found.
+Value wf not found.
+Value qju not found.
+Value w not found.
+Value do not found.
+Value imr not found.
+Value el not found.
+Value irf not found.
+Value os not found.
+0: ncy(ncy)X
+1: dg*<2>(ncy)L uod*(ncy)R
+2: bi(dg*<2>)L hpr(dg*<2>)R q<2>(uod*)L we(uod*)R
+3: aqz(bi)L cx(bi)R g f*(hpr)L kj*(hpr)R o(q<2>)L siw*(q<2>)R uza(we)L xqi(we)R
+4: adf(aqz)L az(aqz)R c*<4>(cx)L dd*(cx)R ecl(g f*)L h(g f*)R ix(kj*)L lo(kj*)R nw*(o)L og*(o)R r<3>(siw*)L u(siw*)R =uu(uza)L vz(uza)R x<3>(xqi)L yx*(xqi)R
+5: =a*<2>(adf)L =ae*(adf)R =arj*(az)L bvw(c*<4>)L cd(c*<4>)R dcr(dd*)L =de(dd*)R du(ecl)L fn*(ecl)R gvu(h)L hf(h)R ie*(ix)L jh*(ix)R kq*(lo)L mw(lo)R =nj(nw*)L ny(nw*)R oac(og*)L ou(og*)R qq*(r<3>)L rx(r<3>)R tmx*(u)L =ug<2>(u)R =v*(vz)L =wv*(x<3>)L =xp*(x<3>)R ys(yx*)L z(yx*)R
+6: =bl*(bvw)L =bwj*(bvw)R =cj*(cd)R =dbu*(dcr)L =dq*(du)L =dz*(du)R eu(fn*)L g(fn*)R =gj*(gvu)L =hdp*(hf)L =hh*(hf)R =i<2>(ie*)L iiy(ie*)R =j(jh*)L k(jh*)R =kjq(kq*)L lk<3>(kq*)R =mo*(mw)L =n*(mw)R =nz*(ny)R =oa*(oac)L =oc*(oac)R =pk*(ou)R =qon(qq*)L qw<2>(qq*)R =ri*(rx)L =s*<3>(rx)R =t i(tmx*)L =tsc(tmx*)R =yq*(ys)L =yw*(ys)R =zv*(z)R
+7: =eh*(eu)L =fsx*(g)L =irv*(iiy)R =ki*(k)R =kv*(lk<3>)L =qv*(qw<2>)L
+Duplicates: 17
+Nodes: 97
+Minimum depth: 4
+Maximum depth: 7
