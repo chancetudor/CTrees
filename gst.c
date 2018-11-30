@@ -54,7 +54,7 @@ extern GST * newGST(int (*c)(void * one, void * two)) {
   gTree->display = 0;
   gTree->compare = c;
   gTree->freeMethod = 0;
-  gTree->swap = (void *)swapVals;
+  setGSTswapper(gTree, (void *)swapVals);
 
   return gTree;
 }

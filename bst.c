@@ -46,6 +46,7 @@ static void displayPostOrder(BST *t, TNODE *n, FILE *fp);
 static void freeSubTree(TNODE *n);
 
 static TNODE * swapVals(TNODE *x, TNODE *y);
+//static void swapVals(TNODE *x, TNODE *y);
 static TNODE *getPred(TNODE *n);
 static TNODE *getSucc(TNODE *n);
 static TNODE *findBSTNode(BST *tree, void *key);
@@ -59,7 +60,8 @@ extern BST * newBST(int (*c)(void * one, void * two)) {
   tree->debugVal = 0;
   tree->comparator = c;
   tree->displayMethod = 0;
-  tree->swapper = (void *)swapVals;
+  //tree->swapper = (void *)swapVals;
+  setBSTswapper(tree, (void *)swapVals);
   tree->freeMethod = 0;
 
   return tree;

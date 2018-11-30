@@ -72,7 +72,7 @@ extern RBT * newRBT(int (*c)(void * x, void * y)) {
   t->display = 0;
   t->compare = c;
   t->freeMethod = 0;
-  t->swap = (void *)swapRBTVals;
+  setRBTswapper(t, (void *)swapRBTVals);
 
   return t;
 }
@@ -98,7 +98,7 @@ extern void setRBTdisplay(RBT *t, void (*d)(void * ptr, FILE * fp)) {
 extern void setRBTswapper(RBT *t, void (*s)(TNODE *x, TNODE *y)) {
   t->swap = s;
   GST * tree = t->tree;
-  setGSTswapper(tree, (void *)swapRBTVals);
+  setGSTswapper(tree, s);
 }
 
 extern void setRBTfree(RBT *t, void (*f)(void * ptr)) {
@@ -169,6 +169,7 @@ extern int deleteRBT(RBT *t, void *key) {
   TNODE * node = findRBTNode(t, newVal);
   node = swapToLeafRBT(t, node);
   deletionFixUp(tree, node);
+  free(newVal);
   newVal = unwrapGST(node); // stores RBTVAL inside node
   pruneLeafRBT(t, node); // frees GSTVAL
   setTNODEfree(node, 0); // does not set a freeMethod for TNODE
