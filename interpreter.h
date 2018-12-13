@@ -12,4 +12,4 @@ extern void readRBTCommands(RBT *tree, char *filename, FILE *outfp);
 extern GST *readGSTCorpus(GST *tree, char * filename);
 extern void readGSTCommands(GST *tree, char *filename, FILE *outfp);
 
-#endif // _INTERPRETER_INCLUDED_
+#endif 

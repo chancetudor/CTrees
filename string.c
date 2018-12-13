@@ -31,9 +31,10 @@ void displaySTRING(void *v,FILE *fp){
 }
 
 int compareSTRING(void *v,void *w){
-    return strcmp(getSTRING((STRING *) v),getSTRING((STRING *) w));
+    return strcmp(getSTRING(v), getSTRING(w));
 }
 
 void freeSTRING(void *v){
+    free(((STRING *)v)->value);
     free((STRING *) v);
 }
