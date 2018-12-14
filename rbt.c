@@ -173,57 +173,48 @@
    return 0;
  }
 
- extern TNODE *swapToLeafRBT(RBT *t, TNODE *node)
- {
+ extern TNODE *swapToLeafRBT(RBT *t, TNODE *node) {
    GST * tree = t->tree;
    return swapToLeafGST(tree, node);
  }
 
- extern void pruneLeafRBT(RBT *t, TNODE *leaf)
- {
+ extern void pruneLeafRBT(RBT *t, TNODE *leaf) {
    GST * tree = t->tree;
    pruneLeafGST(tree, leaf);
  }
 
- extern int sizeRBT(RBT *t)
- {
+ extern int sizeRBT(RBT *t) {
    GST * tree = t->tree;
    return sizeGST(tree);
  }
 
- extern void statisticsRBT(RBT *t, FILE *fp)
- {
+ extern void statisticsRBT(RBT *t, FILE *fp) {
    GST * tree = t->tree;
    statisticsGST(tree, fp);
  }
 
- extern void displayRBT(RBT *t, FILE *fp)
- {
+ extern void displayRBT(RBT *t, FILE *fp) {
    GST * tree = t->tree;
    displayGST(tree, fp);
  }
 
- extern int debugRBT(RBT *t, int level)
- {
+ extern int debugRBT(RBT *t, int level) {
    GST * tree = t->tree;
    return debugGST(tree, level);
  }
 
- extern void freeRBT(RBT *t)
- {
+ extern void freeRBT(RBT *t) {
    GST * tree = t->tree;
    freeGST(tree);
    free(t);
  }
 
- extern void * unwrapRBT(TNODE *n)
- {
+ extern void * unwrapRBT(TNODE *n) {
    RBTVAL *rVal = (RBTVAL *)unwrapGST(n);
    return rVal->value;
  }
 
- extern int freqRBT(RBT *g, void *key)
- {
+ extern int freqRBT(RBT *g, void *key) {
    RBTVAL * newVal = newRBTVAL(g, key);
    GST * tree = g->tree;
    int freq = freqGST(tree, newVal);
@@ -231,14 +222,12 @@
    return freq;
  }
 
- extern int duplicatesRBT(RBT *g)
- {
+ extern int duplicatesRBT(RBT *g) {
    GST * tree = g->tree;
    return duplicatesGST(tree);
  }
 
- static void swapRBTVals(TNODE *a, TNODE *b)
- {
+ static void swapRBTVals(TNODE *a, TNODE *b) {
    void *va = getTNODEvalue(a);
    void *vb = getTNODEvalue(b);
 
@@ -254,30 +243,24 @@
    setColor(y, color);
  }
 
- static TNODE * findRBTNode(RBT *t, void *key)
- {
+ static TNODE * findRBTNode(RBT *t, void *key) {
    GST * tree = t->tree;
    TNODE * temp = getGSTroot(tree);
-   if (temp == 0)
-   {
+   if (temp == 0) {
      return 0;
    }
-   while (temp && compareRBTVAL(unwrapGST(temp), key) != 0)
-   {
-     if (compareRBTVAL(unwrapGST(temp), key) > 0)
-     {
+   while (temp && compareRBTVAL(unwrapGST(temp), key) != 0) {
+     if (compareRBTVAL(unwrapGST(temp), key) > 0) {
        temp = getTNODEleft(temp);
      }
-     else
-     {
+     else {
        temp = getTNODEright(temp);
      }
    }
    return temp;
  }
 
- static void displayRBTVAL(RBTVAL *v, FILE *fp)
- {
+ static void displayRBTVAL(RBTVAL *v, FILE *fp) {
    void * val = v->value;
    v->display(val, fp);
    if (getColor(v) == 0) {
@@ -285,23 +268,20 @@
    }
  }
 
- static int compareRBTVAL(void *x, void *y)
- {
+ static int compareRBTVAL(void *x, void *y) {
    RBTVAL *a = x;
    RBTVAL *b = y;
    return a->compare(a->value, b->value);
  }
 
- static void freeRBTVAL(RBTVAL *v)
- {
+ static void freeRBTVAL(RBTVAL *v) {
    if (v->freeMethod) {
      v->freeMethod(v->value);
    }
    free(v);
  }
 
- static void insertionFixUp(GST *tree, TNODE * n)
- {
+ static void insertionFixUp(GST *tree, TNODE * n) {
    while (1)
    {
      if (getGSTroot(tree) == n)
@@ -347,8 +327,7 @@
    colorBlack(getGSTroot(tree));
  }
 
- static void deletionFixUp(GST * tree, TNODE * n)
- {
+ static void deletionFixUp(GST * tree, TNODE * n) {
    while (1)
    {
      if (getGSTroot(tree) == n)

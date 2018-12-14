@@ -52,6 +52,7 @@
 
    return gTree;
  }
+
  static GSTVAL * newGSTVAL(GST *t, void *v) {
    GSTVAL * value = malloc(sizeof(GSTVAL));
    value->val = v;
